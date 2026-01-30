@@ -53,11 +53,29 @@ class WallpaperWorker(
                 Pair(metrics.widthPixels, metrics.heightPixels)
             }
 
-            // Generate wallpaper
+            // Generate wallpaper (battery info no longer needed for display)
             val bitmap = WallpaperGenerator.generateBitmap(width, height, themeConfig)
 
-            // Set wallpaper
-            wallpaperManager.setBitmap(bitmap)
+            // Apply maximum quality settings like professional wallpaper apps
+            // Fix quality issue: Use setStream with PNG at max quality instead of setBitmap
+            // setBitmap() compresses the image, causing low quality
+            // setStream() with PNG maintains original quality
+            val stream = java.io.ByteArrayOutputStream()
+            
+            // Compress with PNG (lossless) at maximum quality
+            bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream)
+            val inputStream = java.io.ByteArrayInputStream(stream.toByteArray())
+            
+            // Set quality hints for wallpaper manager
+            // These hints ensure Android doesn't downscale or compress further
+            wallpaperManager.suggestDesiredDimensions(width, height)
+            
+            // Set wallpaper ONLY on LOCK SCREEN with maximum quality settings
+            // allowBackup=true, which=FLAG_LOCK for lock screen only
+            wallpaperManager.setStream(inputStream, null, true, WallpaperManager.FLAG_LOCK)
+            
+            inputStream.close()
+            stream.close()
 
             // Update last update timestamp
             repository.updateLastUpdateTimestamp(System.currentTimeMillis())

@@ -26,9 +26,10 @@ class SettingsRepository(private val context: Context) {
         val LAST_UPDATE_KEY = longPreferencesKey("last_update_timestamp")
 
         // Default colors
-        const val DEFAULT_PAST_COLOR = 0xFF1976D2.toInt()      // Blue[700]
-        const val DEFAULT_TODAY_COLOR = 0xFFFF9800.toInt()     // Orange
-        const val DEFAULT_FUTURE_COLOR = 0xFF424242.toInt()    // Grey[800]
+        // Default colors
+        const val DEFAULT_PAST_COLOR = 0xFFFFFFFF.toInt()      // White
+        const val DEFAULT_TODAY_COLOR = 0xFFFFFFFF.toInt()     // White
+        const val DEFAULT_FUTURE_COLOR = 0xFF333333.toInt()    // Dark Grey (~20% White)
         const val DEFAULT_BACKGROUND_COLOR = 0xFF000000.toInt() // Black
     }
 

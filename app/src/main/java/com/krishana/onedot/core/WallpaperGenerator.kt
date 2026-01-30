@@ -19,18 +19,27 @@ object WallpaperGenerator {
         val backgroundColor: Int
     )
 
+    data class BatteryInfo(
+        val percentage: Int,
+        val isCharging: Boolean,
+        val isFull: Boolean,
+        val isLow: Boolean
+    )
+
     /**
-     * Generates a bitmap with 365 dots arranged in a 7-column grid.
+     * Generates a bitmap with 364 dots arranged in a 13-column grid.
      * 
      * @param width Target width in pixels
      * @param height Target height in pixels
      * @param themeConfig Color configuration
+     * @param batteryInfo Optional battery status information
      * @return Generated wallpaper bitmap
      */
     fun generateBitmap(
         width: Int,
         height: Int,
-        themeConfig: ThemeConfig
+        themeConfig: ThemeConfig,
+        batteryInfo: BatteryInfo? = null
     ): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -42,75 +51,92 @@ object WallpaperGenerator {
         val yearStart = LocalDate.of(today.year, 1, 1)
         val daysInYear = if (today.isLeapYear) 366 else 365
         val currentDayOfYear = ChronoUnit.DAYS.between(yearStart, today).toInt() + 1
+        val daysLeft = daysInYear - currentDayOfYear
+        val percent = ((currentDayOfYear.toFloat() / daysInYear) * 100).toInt()
 
-        // Grid layout: 7 columns (days of week), ~53 rows
-        val columns = 7
-        val rows = (daysInYear + columns - 1) / columns // Ceiling division
+        // Grid layout: 13 columns (13 × 28 = 364 dots for clean grid)
+        val columns = 13
+        val totalDots = 364 // Fixed grid size for visual consistency
+        val rows = totalDots / columns // 28 rows
 
-        // Calculate dot size and spacing with minimal padding
-        val horizontalPadding = width * 0.08f
-        val verticalPadding = height * 0.02f  // Reduced vertical padding to use more space
-        val availableWidth = width - (2 * horizontalPadding)
-        val availableHeight = height - (2 * verticalPadding)
-
-        // Use available width to determine cell size (fills screen better)
+        // Padding - Compact minimal look
+        val topPadding = height * 0.28f  // Space for clock
+        val bottomPadding = height * 0.12f  // Space for bottom text and controls
+        val sidePadding = width * 0.08f 
+        
+        val availableWidth = width - (2 * sidePadding)
+        val availableHeight = height - topPadding - bottomPadding
+        
+        // Calculate cell size based on width
         val cellWidth = availableWidth / columns
+        
+        // Calculate cell height to fit all rows
         val cellHeight = availableHeight / rows
         
-        // Use cellWidth for dot sizing to make them bigger and more visible
-        val cellSize = cellWidth
-        val dotRadius = cellSize * 0.40f // 80% of cell width for dot diameter
-
-        // Center the grid horizontally, start from top with minimal padding vertically
-        val gridWidth = columns * cellSize
-        val gridHeight = rows * cellHeight  // Use actual cellHeight for grid height
-        val startX = (width - gridWidth) / 2f
-        val startY = verticalPadding  // Start closer to top
+        // Use the smaller dimension to ensure everything fits
+        val cellSize = min(cellWidth, cellHeight)
+        
+        // Much smaller dots with gap spacing (28% of cell + implicit gap from grid)
+        val dotRadius = cellSize * 0.28f
+        
+        // Recalculate actual grid dimensions
+        val totalGridWidth = cellSize * columns
+        val totalGridHeight = cellSize * rows
+        
+        // Center the grid
+        val startX = (width - totalGridWidth) / 2f
+        val startY = topPadding + (availableHeight - totalGridHeight) / 2f
 
         val paint = Paint().apply {
             isAntiAlias = true
             style = Paint.Style.FILL
         }
 
-        val strokePaint = Paint().apply {
-            isAntiAlias = true
-            style = Paint.Style.STROKE
-            strokeWidth = 4f
-            color = themeConfig.todayColor
-        }
-
-        // Draw dots
-        for (day in 1..daysInYear) {
+        // Draw dots (fixed 364-dot grid)
+        for (day in 1..totalDots) {
             val row = (day - 1) / columns
             val col = (day - 1) % columns
 
             val centerX = startX + (col * cellSize) + (cellSize / 2f)
-            val centerY = startY + (row * cellHeight) + (cellHeight / 2f)
+            val centerY = startY + (row * cellSize) + (cellSize / 2f)
 
             when {
                 day < currentDayOfYear -> {
-                    // Past days - filled
+                    // Past: Filled White
                     paint.color = themeConfig.pastColor
                     canvas.drawCircle(centerX, centerY, dotRadius, paint)
                 }
                 day == currentDayOfYear -> {
-                    // Today - highlighted with border
+                    // Today: Filled White (same as past in minimalistic design)
+                    // Optional: Could add a subtle indication if requested, but reference looks uniform
                     paint.color = themeConfig.todayColor
                     canvas.drawCircle(centerX, centerY, dotRadius, paint)
-                    // Add white border
-                    strokePaint.color = android.graphics.Color.WHITE
-                    canvas.drawCircle(centerX, centerY, dotRadius + 2f, strokePaint)
                 }
                 else -> {
-                    // Future days - outline only
+                    // Future: Filled Dark Grey
                     paint.color = themeConfig.futureColor
-                    paint.style = Paint.Style.STROKE
-                    paint.strokeWidth = 3f
                     canvas.drawCircle(centerX, centerY, dotRadius, paint)
-                    paint.style = Paint.Style.FILL // Reset
                 }
             }
         }
+
+        // Draw Bottom Text (Progress only, no battery) with maximum quality
+        val textPaint = Paint().apply {
+            isAntiAlias = true                  // Smooth edges
+            isSubpixelText = true              // Sub-pixel rendering for sharper text
+            isLinearText = true                // Don't scale text for better quality
+            isDither = true                    // Better color rendering
+            isFilterBitmap = true              // Filter when scaling
+            color = 0xFFCCCCCC.toInt()        // Lighter grey for better visibility
+            textSize = width * 0.025f          // Much smaller text
+            textAlign = Paint.Align.CENTER
+            typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.NORMAL)
+        }
+
+        val text = "$daysLeft days \u2022 $percent% Complete"
+        
+        // Position higher for better balance
+        canvas.drawText(text, width / 2f, height * 0.88f, textPaint)
 
         return bitmap
     }
