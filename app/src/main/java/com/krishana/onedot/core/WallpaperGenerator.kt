@@ -54,10 +54,10 @@ object WallpaperGenerator {
         val daysLeft = daysInYear - currentDayOfYear
         val percent = ((currentDayOfYear.toFloat() / daysInYear) * 100).toInt()
 
-        // Grid layout: 13 columns (13 × 28 = 364 dots for clean grid)
+        // Grid layout: 365 dots total for full year
         val columns = 13
-        val totalDots = 364 // Fixed grid size for visual consistency
-        val rows = totalDots / columns // 28 rows
+        val totalDots = 365 // Full year (365 days)
+        val rows = (totalDots + columns - 1) / columns // 29 rows (ceiling division)
 
         // Padding - Compact minimal look
         val topPadding = height * 0.28f  // Space for clock

@@ -28,7 +28,7 @@ class SettingsRepository(private val context: Context) {
         // Default colors
         // Default colors
         const val DEFAULT_PAST_COLOR = 0xFFFFFFFF.toInt()      // White
-        const val DEFAULT_TODAY_COLOR = 0xFFFFFFFF.toInt()     // White
+        const val DEFAULT_TODAY_COLOR = 0xFFFF6B35.toInt()     // Orange (current day highlight)
         const val DEFAULT_FUTURE_COLOR = 0xFF333333.toInt()    // Dark Grey (~20% White)
         const val DEFAULT_BACKGROUND_COLOR = 0xFF000000.toInt() // Black
     }
@@ -91,5 +91,24 @@ class SettingsRepository(private val context: Context) {
             "future" to (preferences.map { it[FUTURE_COLOR_KEY] ?: DEFAULT_FUTURE_COLOR }.first()),
             "background" to (preferences.map { it[BACKGROUND_COLOR_KEY] ?: DEFAULT_BACKGROUND_COLOR }.first())
         )
+    }
+
+    /**
+     * Synchronous getters for immediate color retrieval
+     */
+    suspend fun getPastColor(): Int {
+        return context.dataStore.data.first()[PAST_COLOR_KEY] ?: DEFAULT_PAST_COLOR
+    }
+
+    suspend fun getTodayColor(): Int {
+        return context.dataStore.data.first()[TODAY_COLOR_KEY] ?: DEFAULT_TODAY_COLOR
+    }
+
+    suspend fun getFutureColor(): Int {
+        return context.dataStore.data.first()[FUTURE_COLOR_KEY] ?: DEFAULT_FUTURE_COLOR
+    }
+
+    suspend fun getBackgroundColor(): Int {
+        return context.dataStore.data.first()[BACKGROUND_COLOR_KEY] ?: DEFAULT_BACKGROUND_COLOR
     }
 }
