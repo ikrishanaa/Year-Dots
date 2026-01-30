@@ -47,22 +47,25 @@ object WallpaperGenerator {
         val columns = 7
         val rows = (daysInYear + columns - 1) / columns // Ceiling division
 
-        // Calculate dot size and spacing
-        val horizontalPadding = width * 0.05f
-        val verticalPadding = height * 0.05f
+        // Calculate dot size and spacing with minimal padding
+        val horizontalPadding = width * 0.08f
+        val verticalPadding = height * 0.02f  // Reduced vertical padding to use more space
         val availableWidth = width - (2 * horizontalPadding)
         val availableHeight = height - (2 * verticalPadding)
 
+        // Use available width to determine cell size (fills screen better)
         val cellWidth = availableWidth / columns
         val cellHeight = availableHeight / rows
-        val cellSize = min(cellWidth, cellHeight)
-        val dotRadius = cellSize * 0.35f // 70% of cell width for dot diameter
+        
+        // Use cellWidth for dot sizing to make them bigger and more visible
+        val cellSize = cellWidth
+        val dotRadius = cellSize * 0.40f // 80% of cell width for dot diameter
 
-        // Center the grid
+        // Center the grid horizontally, start from top with minimal padding vertically
         val gridWidth = columns * cellSize
-        val gridHeight = rows * cellSize
+        val gridHeight = rows * cellHeight  // Use actual cellHeight for grid height
         val startX = (width - gridWidth) / 2f
-        val startY = (height - gridHeight) / 2f
+        val startY = verticalPadding  // Start closer to top
 
         val paint = Paint().apply {
             isAntiAlias = true
@@ -82,7 +85,7 @@ object WallpaperGenerator {
             val col = (day - 1) % columns
 
             val centerX = startX + (col * cellSize) + (cellSize / 2f)
-            val centerY = startY + (row * cellSize) + (cellSize / 2f)
+            val centerY = startY + (row * cellHeight) + (cellHeight / 2f)
 
             when {
                 day < currentDayOfYear -> {
