@@ -4,8 +4,21 @@
 
     <!-- Permission to set wallpaper -->
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <!-- Permission to suggest wallpaper dimensions -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
     <!-- Permission to receive boot completed broadcast -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    
+    <!-- Notifications (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    
+    <!-- Storage permissions (Standard for wallpaper apps, triggers popup) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    
+    <!-- Background Execution -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"

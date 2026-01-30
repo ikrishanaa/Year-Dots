@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -39,48 +40,156 @@ import java.io.ByteArrayOutputStream
  */
 suspend fun applyWallpaperNow(context: Context, repository: SettingsRepository) {
     withContext(Dispatchers.IO) {
-        val wallpaperManager = WallpaperManager.getInstance(context)
-        
-        // Get desired dimensions
-        val width = wallpaperManager.desiredMinimumWidth
-        val height = wallpaperManager.desiredMinimumHeight
-        
-        // Suggest dimensions to prevent downscaling
-        wallpaperManager.suggestDesiredDimensions(width, height)
-        
-        // Get current settings
-        val pastColor = repository.getPastColor()
-        val todayColor = repository.getTodayColor()
-        val futureColor = repository.getFutureColor()
-        val backgroundColor = repository.getBackgroundColor()
-        
-        val themeConfig = WallpaperGenerator.ThemeConfig(
-            pastColor = pastColor,
-            todayColor = todayColor,
-            futureColor = futureColor,
-            backgroundColor = backgroundColor
-        )
-        
-        // Generate bitmap
-        val bitmap = WallpaperGenerator.generateBitmap(width, height, themeConfig)
-        
-        // Convert to PNG with maximum quality
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, outputStream)
-        val inputStream = outputStream.toByteArray().inputStream()
-        
-        // Set wallpaper ONLY on LOCK SCREEN
-        wallpaperManager.setStream(inputStream, null, true, WallpaperManager.FLAG_LOCK)
-        
-        inputStream.close()
-        bitmap.recycle()
+        try {
+            android.util.Log.d("YearDots", "=== WALLPAPER UPDATE START ===")
+            
+            // CRITICAL: Check permissions before attempting to set wallpaper
+            android.util.Log.d("YearDots", "Checking SET_WALLPAPER permission...")
+            val hasWallpaperPerm = androidx.core.content.ContextCompat.checkSelfPermission(
+                context, android.Manifest.permission.SET_WALLPAPER
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            
+            android.util.Log.d("YearDots", "SET_WALLPAPER permission: $hasWallpaperPerm")
+            
+            if (!hasWallpaperPerm) {
+                android.util.Log.e("YearDots", "ERROR: SET_WALLPAPER permission not granted!")
+                throw SecurityException("SET_WALLPAPER permission not granted. Please enable it in app permissions.")
+            }
+            
+            // Check storage permissions (needed on some devices)
+            android.util.Log.d("YearDots", "Checking storage permissions...")
+            android.util.Log.d("YearDots", "Android SDK: ${android.os.Build.VERSION.SDK_INT}")
+            
+            val hasStoragePerm = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                val perm = androidx.core.content.ContextCompat.checkSelfPermission(
+                    context, android.Manifest.permission.READ_MEDIA_IMAGES
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                android.util.Log.d("YearDots", "READ_MEDIA_IMAGES permission: $perm")
+                perm
+            } else {
+                val hasRead = androidx.core.content.ContextCompat.checkSelfPermission(
+                    context, android.Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                val hasWrite = androidx.core.content.ContextCompat.checkSelfPermission(
+                    context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                android.util.Log.d("YearDots", "READ_EXTERNAL_STORAGE: $hasRead, WRITE_EXTERNAL_STORAGE: $hasWrite")
+                hasRead && hasWrite
+            }
+            
+            if (!hasStoragePerm) {
+                android.util.Log.e("YearDots", "ERROR: Storage permissions not granted!")
+                throw SecurityException("Storage permissions not granted. Please enable them in app settings.")
+            }
+            
+            android.util.Log.d("YearDots", "All permissions OK, getting WallpaperManager...")
+            val wallpaperManager = WallpaperManager.getInstance(context)
+            
+            // Get desired dimensions
+            val width = wallpaperManager.desiredMinimumWidth
+            val height = wallpaperManager.desiredMinimumHeight
+            android.util.Log.d("YearDots", "Wallpaper dimensions: ${width}x${height}")
+            
+            // Suggest dimensions to prevent downscaling (optional - requires SET_WALLPAPER_HINTS permission)
+            try {
+                wallpaperManager.suggestDesiredDimensions(width, height)
+                android.util.Log.d("YearDots", "Successfully suggested dimensions: ${width}x${height}")
+            } catch (e: SecurityException) {
+                android.util.Log.w("YearDots", "Cannot suggest dimensions (missing SET_WALLPAPER_HINTS permission), continuing anyway...")
+            }
+            
+            // Get current settings
+            android.util.Log.d("YearDots", "Loading color settings...")
+            val pastColor = repository.getPastColor()
+            val todayColor = repository.getTodayColor()
+            val futureColor = repository.getFutureColor()
+            val backgroundColor = repository.getBackgroundColor()
+            
+            android.util.Log.d("YearDots", "Colors - Past: 0x${pastColor.toString(16)}, Today: 0x${todayColor.toString(16)}, Future: 0x${futureColor.toString(16)}, BG: 0x${backgroundColor.toString(16)}")
+            
+            val themeConfig = WallpaperGenerator.ThemeConfig(
+                pastColor = pastColor,
+                todayColor = todayColor,
+                futureColor = futureColor,
+                backgroundColor = backgroundColor
+            )
+            
+            // Generate bitmap
+            android.util.Log.d("YearDots", "Generating wallpaper bitmap...")
+            val bitmap = WallpaperGenerator.generateBitmap(width, height, themeConfig)
+            android.util.Log.d("YearDots", "Bitmap generated: ${bitmap.width}x${bitmap.height}, config: ${bitmap.config}")
+            
+            try {
+                // Use setBitmap instead of setStream for better compatibility
+                // Some OEM devices have issues with setStream
+                android.util.Log.d("YearDots", "Setting wallpaper on LOCK SCREEN...")
+                wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK)
+                android.util.Log.d("YearDots", "✓ Wallpaper set successfully!")
+            } catch (e: SecurityException) {
+                android.util.Log.e("YearDots", "SecurityException: ${e.message}", e)
+                android.util.Log.e("YearDots", "Stack trace: ${e.stackTraceToString()}")
+                throw SecurityException("Permission denied when setting wallpaper. Please ensure all permissions are granted in Settings > Apps > Year Dots > Permissions.", e)
+            } catch (e: IllegalArgumentException) {
+                android.util.Log.e("YearDots", "IllegalArgumentException: ${e.message}", e)
+                throw Exception("Invalid wallpaper size or format. Please try again.", e)
+            } catch (e: Exception) {
+                android.util.Log.e("YearDots", "Unexpected error: ${e.message}", e)
+                android.util.Log.e("YearDots", "Error type: ${e.javaClass.name}")
+                android.util.Log.e("YearDots", "Stack trace: ${e.stackTraceToString()}")
+                throw Exception("Failed to set wallpaper: ${e.message}", e)
+            } finally {
+                bitmap.recycle()
+                android.util.Log.d("YearDots", "Bitmap recycled")
+            }
+        } catch (e: SecurityException) {
+            // Re-throw security exceptions with clear message
+            android.util.Log.e("YearDots", "Final SecurityException handler: ${e.message}", e)
+            throw Exception("Permission Error: ${e.message}", e)
+        } catch (e: Exception) {
+            // Re-throw with context
+            android.util.Log.e("YearDots", "Final error handler: ${e.message}", e)
+            throw Exception("Wallpaper update failed: ${e.message}", e)
+        } finally {
+            android.util.Log.d("YearDots", "=== WALLPAPER UPDATE END ===")
+        }
     }
 }
 
 
+
+
+
 class MainActivity : ComponentActivity() {
+    
+    // Permission state
+    private var hasPermissions by mutableStateOf(false)
+    
+    // Permission launcher - must be registered before onCreate
+    private val permissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions.all { it.value }
+        hasPermissions = allGranted
+        
+        if (!allGranted) {
+            Toast.makeText(
+                this,
+                "⚠️ Permissions are needed for the app to function properly",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Initial check
+        checkPermissions()
+        
+        if (!hasPermissions) {
+            // Request on startup if not granted
+            requestPermissions()
+        }
         
         // Schedule daily update on first launch
         WorkScheduler.scheduleDailyWallpaperUpdate(this)
@@ -91,12 +200,90 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SettingsScreen()
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        // Permission Warning Banner
+                        if (!hasPermissions) {
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.errorContainer
+                                )
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = "⚠️ Permissions Needed",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = "Please grant all permissions to allow the wallpaper to update automatically.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Button(onClick = { requestPermissions() }) {
+                                        Text("Grant Permissions")
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Main Settings UI
+                        SettingsScreen()
+                    }
                 }
             }
         }
     }
+    
+    override fun onResume() {
+        super.onResume()
+        // Re-check permissions when user returns to app
+        // (e.g., after granting permissions in Settings)
+        checkPermissions()
+    }
+    
+    private fun checkPermissions() {
+        val permissions = getRequiredPermissions()
+        hasPermissions = permissions.all {
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                this, it
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
+    }
+    
+    private fun requestPermissions() {
+        val permissions = getRequiredPermissions()
+        permissionLauncher.launch(permissions.toTypedArray())
+    }
+    
+    private fun getRequiredPermissions(): List<String> {
+        val permissions = mutableListOf<String>()
+        
+        // Core functionality
+        permissions.add(android.Manifest.permission.SET_WALLPAPER)
+        
+        // Android 13+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(android.Manifest.permission.POST_NOTIFICATIONS)
+            permissions.add(android.Manifest.permission.READ_MEDIA_IMAGES)
+        } else {
+            // Android 12 and below - need both READ and WRITE for wallpaper operations
+            permissions.add(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            permissions.add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        
+        return permissions
+    }
 }
+
 
 @Composable
 fun SettingsScreen() {
@@ -137,6 +324,8 @@ fun SettingsScreen() {
                      pendingFutureColor != null || 
                      pendingBackgroundColor != null
 
+    var showDebugInfo by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -146,12 +335,93 @@ fun SettingsScreen() {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Header
-        Text(
-            text = "Year Dots",
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Year Dots",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
+            OutlinedButton(onClick = { showDebugInfo = !showDebugInfo }) {
+                Text(if (showDebugInfo) "Hide Debug" else "Show Debug")
+            }
+        }
+        
+        // Debug Info Card
+        if (showDebugInfo) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "🔍 Debug Information",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Android Version
+                    DebugInfoRow("Android SDK", android.os.Build.VERSION.SDK_INT.toString())
+                    DebugInfoRow("Android Version", android.os.Build.VERSION.RELEASE)
+                    DebugInfoRow("Device", "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}")
+                    
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    
+                    // Permissions
+                    Text(
+                        text = "Permissions:",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    val hasWallpaper = androidx.core.content.ContextCompat.checkSelfPermission(
+                        context, android.Manifest.permission.SET_WALLPAPER
+                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                    DebugInfoRow("SET_WALLPAPER", if (hasWallpaper) "✅ Granted" else "❌ Denied", if (hasWallpaper) Color(0xFF4CAF50) else Color(0xFFF44336))
+                    
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        val hasNotif = androidx.core.content.ContextCompat.checkSelfPermission(
+                            context, android.Manifest.permission.POST_NOTIFICATIONS
+                        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                        DebugInfoRow("POST_NOTIFICATIONS", if (hasNotif) "✅ Granted" else "❌ Denied", if (hasNotif) Color(0xFF4CAF50) else Color(0xFFF44336))
+                        
+                        val hasMedia = androidx.core.content.ContextCompat.checkSelfPermission(
+                            context, android.Manifest.permission.READ_MEDIA_IMAGES
+                        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                        DebugInfoRow("READ_MEDIA_IMAGES", if (hasMedia) "✅ Granted" else "❌ Denied", if (hasMedia) Color(0xFF4CAF50) else Color(0xFFF44336))
+                    } else {
+                        val hasRead = androidx.core.content.ContextCompat.checkSelfPermission(
+                            context, android.Manifest.permission.READ_EXTERNAL_STORAGE
+                        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                        DebugInfoRow("READ_EXTERNAL_STORAGE", if (hasRead) "✅ Granted" else "❌ Denied", if (hasRead) Color(0xFF4CAF50) else Color(0xFFF44336))
+                        
+                        val hasWrite = androidx.core.content.ContextCompat.checkSelfPermission(
+                            context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                        DebugInfoRow("WRITE_EXTERNAL_STORAGE", if (hasWrite) "✅ Granted" else "❌ Denied", if (hasWrite) Color(0xFF4CAF50) else Color(0xFFF44336))
+                    }
+                    
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    
+                    // Wallpaper Info
+                    val wallpaperManager = WallpaperManager.getInstance(context)
+                    DebugInfoRow("Screen Width", "${wallpaperManager.desiredMinimumWidth}px")
+                    DebugInfoRow("Screen Height", "${wallpaperManager.desiredMinimumHeight}px")
+                    
+                    Text(
+                        text = "Tap 'Show Debug' again to hide this info",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+            }
+        }
 
         // Live Preview Card
         Card(
@@ -525,4 +795,27 @@ fun ImprovedColorPickerDialog(
             }
         }
     )
+}
+// This is a temporary file to append to MainActivity.kt
+
+@Composable
+fun DebugInfoRow(label: String, value: String, valueColor: Color? = null) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Medium,
+            color = valueColor ?: MaterialTheme.colorScheme.onSurface
+        )
+    }
 }
