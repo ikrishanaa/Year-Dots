@@ -1,15 +1,16 @@
 package com.krishana.onedot.ui.components
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -17,11 +18,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutDialog(onDismiss: () -> Unit) {
+    android.util.Log.d("YearDots", "AboutDialog composable is being rendered")
+    
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
+    var autoUpdate by remember { mutableStateOf(false) }
     
     // Get app version
     val versionName = remember {
@@ -32,42 +40,58 @@ fun AboutDialog(onDismiss: () -> Unit) {
         }
     }
     
-    AlertDialog(
+    android.util.Log.d("YearDots", "AboutDialog version: $versionName")
+    
+    // Full-screen About page wrapped in Dialog for proper display
+    Dialog(
         onDismissRequest = onDismiss,
-        icon = {
-            Icon(
-                imageVector = Icons.Default.Info,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(32.dp)
-            )
-        },
-        title = {
-            Text(
-                text = "About",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        text = {
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // Top App Bar with back button
+                TopAppBar(
+                    title = { 
+                        Text(
+                            "About",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Medium
+                        ) 
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onDismiss) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
+                )
+            
+            // Scrollable content
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
             ) {
-                // App Description
-                Text(
-                    text = "Year Dots is a beautiful minimalist wallpaper that visualizes every day of the year as a dot. Watch your progress through the year on your lock screen!",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                
-                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 
                 // README
                 AboutMenuItem(
-                    icon = Icons.Default.Info,
+                    icon = Icons.Default.Menu,
                     title = "README",
                     subtitle = "Check the GitHub repository and the README",
                     onClick = {
@@ -81,7 +105,7 @@ fun AboutDialog(onDismiss: () -> Unit) {
                 
                 // Latest Release
                 AboutMenuItem(
-                    icon = Icons.Default.Info,
+                    icon = Icons.Default.Refresh,
                     title = "Latest release",
                     subtitle = "Look for changelogs and new versions",
                     onClick = {
@@ -95,7 +119,7 @@ fun AboutDialog(onDismiss: () -> Unit) {
                 
                 // GitHub Issues
                 AboutMenuItem(
-                    icon = Icons.Default.Info,
+                    icon = Icons.Default.Warning,
                     title = "GitHub issue",
                     subtitle = "Submit an issue for bug report or feature request",
                     onClick = {
@@ -107,54 +131,126 @@ fun AboutDialog(onDismiss: () -> Unit) {
                     }
                 )
                 
-                // Credits
+                // Sponsor (placeholder - update with your sponsor link)
                 AboutMenuItem(
-                    icon = Icons.Default.Info,
-                    title = "Credits",
-                    subtitle = "Built with Jetpack Compose",
-                    onClick = { }
+                    icon = Icons.Default.Favorite,
+                    title = "Sponsor",
+                    subtitle = "Support this app by sponsoring on GitHub",
+                    onClick = {
+                        try {
+                            uriHandler.openUri("https://github.com/sponsors/ikrishnaa")
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Not configured yet", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 )
                 
-                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                // Telegram channel (placeholder - update with your link)
+                AboutMenuItem(
+                    icon = Icons.Default.Send,
+                    title = "Telegram channel",
+                    subtitle = "https://t.me/your_channel",
+                    onClick = {
+                        Toast.makeText(context, "Update your Telegram link", Toast.LENGTH_SHORT).show()
+                    }
+                )
+                
+                // Matrix space (placeholder - update with your link)
+                AboutMenuItem(
+                    icon = Icons.Default.Email,
+                    title = "Matrix space",
+                    subtitle = "https://matrix.to/#/#your-space.matrix.org",
+                    onClick = {
+                        Toast.makeText(context, "Update your Matrix link", Toast.LENGTH_SHORT).show()
+                    }
+                )
+                
+                // Credits
+                AboutMenuItem(
+                    icon = Icons.Default.Star,
+                    title = "Credits",
+                    subtitle = "Credits and libre software",
+                    onClick = {
+                        Toast.makeText(
+                            context, 
+                            "Built with Jetpack Compose & Material 3", 
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                )
+                
+                // Auto update with toggle
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { autoUpdate = !autoUpdate }
+                        .padding(vertical = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = "Auto update",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Normal
+                        )
+                        Text(
+                            text = "Automatically check for the latest version on GitHub",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 13.sp
+                        )
+                    }
+                    Switch(
+                        checked = autoUpdate,
+                        onCheckedChange = { autoUpdate = it }
+                    )
+                }
                 
                 // Version
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                        .padding(vertical = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column(
+                        modifier = Modifier.weight(1f)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
-                        )
                         Text(
                             text = "Version",
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Normal
+                        )
+                        Text(
+                            text = versionName,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 13.sp
                         )
                     }
-                    Text(
-                        text = versionName,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
                 }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Close")
+                
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
-    )
+    }
+    }
 }
 
 @Composable
@@ -168,8 +264,8 @@ fun AboutMenuItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -184,12 +280,13 @@ fun AboutMenuItem(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Normal
             )
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 13.sp
             )
         }
     }

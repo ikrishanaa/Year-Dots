@@ -387,9 +387,12 @@ fun SettingsScreen() {
                 fontSize = 36.sp
             )
             IconButton(
-                onClick = { showAboutDialog = true },
+                onClick = { 
+                    android.util.Log.d("YearDots", "Info icon clicked - setting showAboutDialog to true")
+                    showAboutDialog = true 
+                },
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(40.dp)
                     .clip(CircleShape)
             ) {
                 Icon(
@@ -438,7 +441,9 @@ fun SettingsScreen() {
                         pastColor = Color(currentPastColor),
                         todayColor = Color(currentTodayColor),
                         futureColor = Color(currentFutureColor),
-                        backgroundColor = Color.Transparent
+                        backgroundColor = Color.Transparent,
+                        dotShape = currentDotShape,
+                        dotDensity = currentDotDensity
                     )
                 }
                 
@@ -543,7 +548,8 @@ fun SettingsScreen() {
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
                         .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.3f))
-                        .padding(8.dp),
+                        .padding(8.dp)
+                        .height(IntrinsicSize.Min),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     // Dot
@@ -564,8 +570,8 @@ fun SettingsScreen() {
                     }
                     
                     Spacer(modifier = Modifier
-                        .width(1.dp)
-                        .height(32.dp)
+                        .width(0.5.dp)
+                        .fillMaxHeight()
                         .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
                     )
                     
@@ -588,7 +594,7 @@ fun SettingsScreen() {
                     
                     Spacer(modifier = Modifier
                         .width(1.dp)
-                        .height(32.dp)
+                        .fillMaxHeight()
                         .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
                     )
                     
@@ -611,7 +617,7 @@ fun SettingsScreen() {
                     
                     Spacer(modifier = Modifier
                         .width(1.dp)
-                        .height(32.dp)
+                        .fillMaxHeight()
                         .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
                     )
                     
@@ -622,14 +628,20 @@ fun SettingsScreen() {
                         onClick = { pendingDotShape = "pill" }
                     ) {
                         Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .background(
-                                    if (currentDotShape == "pill") MaterialTheme.colorScheme.onSurface 
-                                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                    RoundedCornerShape(0.dp)
-                                )
-                        )
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .width(24.dp)
+                                    .height(12.dp)
+                                    .background(
+                                        if (currentDotShape == "pill") MaterialTheme.colorScheme.onSurface 
+                                        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                        RoundedCornerShape(50)
+                                    )
+                            )
+                        }
                     }
                 }
             }
@@ -776,6 +788,15 @@ fun SettingsScreen() {
                 pendingBackgroundColor = color.toArgb()
                 showBackgroundColorPicker = false
             }
+        )
+    }
+
+    // About Dialog
+    android.util.Log.d("YearDots", "showAboutDialog state: $showAboutDialog")
+    if (showAboutDialog) {
+        android.util.Log.d("YearDots", "Rendering AboutDialog...")
+        AboutDialog(
+            onDismiss = { showAboutDialog = false }
         )
     }
 
