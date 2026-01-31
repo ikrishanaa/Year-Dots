@@ -1,99 +1,257 @@
-# Year Dots - 365 Progress Wallpaper
+# Year Dots - Your Year in 365 Dots
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Platform-Android-green.svg" alt="Platform">
-  <img src="https://img.shields.io/badge/Language-Kotlin-blue.svg" alt="Language">
-  <img src="https://img.shields.io/badge/Min%20SDK-26-orange.svg" alt="Min SDK">
+  <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" alt="Year Dots Icon" width="120"/>
 </p>
 
-**Year Dots** is a minimalist Android wallpaper app that automatically updates your home screen daily with a visual 365-dot calendar representing your year's progress.
+<p align="center">
+  <strong>A minimalist Android wallpaper that visualizes your year's progress, one day at a time</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white" alt="Platform">
+  <img src="https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white" alt="Language">
+  <img src="https://img.shields.io/badge/Min%20SDK-26%20(Android%208.0)-orange" alt="Min SDK">
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
+  <img src="https://img.shields.io/github/v/release/yourusername/year-dots?include_prereleases" alt="Release">
+</p>
+
+---
+
+## 📖 About
+
+**Year Dots** transforms your phone's wallpaper into a daily reminder of time's passage. Each day of the year is represented by a single dot in a 365-dot grid that updates automatically at midnight.
+
+> *"Time is passing. Make it count."* ⏳
+
+Inspired by life calendar visualizations and the philosophy that awareness of time's finite nature helps us live more intentionally.
+
+---
 
 ## ✨ Features
 
-- 🎨 **365-Dot Calendar Grid** - Past days filled, today highlighted, future outlined
-- 🔄 **Daily Auto-Update** - Wallpaper refreshes automatically at midnight (WorkManager)
-- 🎨 **Fully Customizable** - Choose colors for past, today, future, and background
-- 🔋 **Battery Friendly** - Efficient background tasks with minimal impact
-- 📱 **100% Offline** - No internet required, no tracking, no ads
-- 🌙 **AMOLED-Optimized** - Dark backgrounds save battery on modern displays
+### Core Functionality
+- 🗓️ **365-Dot Calendar Grid** - Visual representation of the entire year
+- 🔄 **Automatic Daily Updates** - Wallpaper refreshes at midnight using WorkManager
+- 🎨 **Fully Customizable Colors** - Choose colors for past, present, future, and background
+- 🔲 **Four Dot Shapes** - Circle, Rounded Square, Square, and Pill
+- 📏 **Four Size Options** - Tiny, Small, Medium, and Large dot densities
+- 👁️ **Live Preview** - See changes in real-time before applying
+
+### Privacy & Performance
+- 🔒 **100% Offline** - No internet permission, no tracking, zero ads
+- 🔋 **Battery Efficient** - Optimized background tasks with minimal battery impact
+- 🌙 **AMOLED-Friendly** - Dark backgrounds conserve battery on modern displays
+- 🚫 **No Data Collection** - Your privacy is guaranteed
+
+---
 
 ## 📱 Screenshots
 
-*(Add screenshots here after building)*
+<p align="center">
+  <i>Screenshots coming soon...</i>
+</p>
 
-## 🚀 Getting Started
+<!-- TODO: Add screenshots here
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="200">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="200">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="200">
+</p>
+-->
 
-### Prerequisites
+---
 
-- Android Studio Arctic Fox or later
-- Android SDK 26+ (Android 8.0 Oreo)
-- Kotlin 1.9+
+## 📥 Installation
 
-### Build & Install
+### Option 1: Download APK (Recommended)
+1. Go to [Releases](https://github.com/yourusername/year-dots/releases)
+2. Download the latest `YearDots-v*.apk`
+3. Install on your Android device (you may need to enable "Install from Unknown Sources")
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/year-dots.git
-   cd year-dots
-   ```
+### Option 2: F-Droid (Coming Soon)
+Year Dots will be available on F-Droid repository soon.
 
-2. Open in Android Studio
+### Option 3: Build from Source
+```bash
+git clone https://github.com/yourusername/year-dots.git
+cd year-dots
+./gradlew assembleDebug
+# APK will be in app/build/outputs/apk/debug/
+```
 
-3. Sync Gradle dependencies
+---
 
-4. Run on emulator or physical device
+## 🚀 Quick Start
+
+1. **Install the app** using one of the methods above
+2. **Open Year Dots** and configure your preferred colors
+3. **Tap "Set Wallpaper"** to apply
+4. That's it! Your wallpaper will auto-update daily at midnight
+
+### Customization Options
+- **Colors**: Customize past days, today, future days, and background
+- **Shapes**: Choose from Dot, Rounded, Square, or Pill
+- **Size**: Select Tiny, Small, Medium, or Large density
+- **Preview**: See all changes in real-time before applying
+
+---
 
 ## 🛠️ Technical Stack
 
-- **Language**: Kotlin
-- **UI Framework**: Jetpack Compose (Material 3)
-- **Background Tasks**: WorkManager
-- **Data Persistence**: DataStore (Preferences)
-- **Graphics**: Android Canvas API
+| Component | Technology |
+|-----------|-----------|
+| **Language** | Kotlin |
+| **UI Framework** | Jetpack Compose (Material 3) |
+| **Background Tasks** | WorkManager |
+| **Data Persistence** | DataStore (Preferences) |
+| **Graphics Engine** | Android Canvas API |
+| **Architecture** | MVVM-inspired, Repository pattern |
+
+### Key Dependencies
+- `androidx.work:work-runtime-ktx` - Daily wallpaper updates
+- `androidx.datastore:datastore-preferences` - Settings storage
+- `androidx.compose.material3:material3` - Modern UI components
+
+---
 
 ## 📁 Project Structure
 
 ```
 app/
-├── core/              # WallpaperGenerator (Canvas drawing logic)
-├── data/              # SettingsRepository (DataStore)
-├── worker/            # WallpaperWorker (background updates)
-├── util/              # WorkScheduler
-├── receiver/          # BootReceiver (reschedule after reboot)
-└── ui/theme/          # Material 3 theme
+├── core/
+│   └── WallpaperGenerator.kt      # Canvas rendering logic
+├── data/
+│   └── SettingsRepository.kt      # DataStore wrapper
+├── worker/
+│   └── WallpaperWorker.kt         # Background update worker
+├── util/
+│   └── WorkScheduler.kt           # Task scheduling
+├── receiver/
+│   └── BootReceiver.kt            # Reschedule after reboot
+├── ui/
+│   ├── components/                # Reusable Compose components
+│   └── theme/                     # Material 3 theme
+└── MainActivity.kt                # Main UI and ViewModel logic
 ```
+
+---
 
 ## 🎯 How It Works
 
-1. **Initialize**: App sets initial wallpaper and schedules daily WorkManager task
-2. **Daily Update**: At ~00:01, WorkManager triggers `WallpaperWorker`
-3. **Generate**: Worker fetches settings, calculates current day, draws 365 dots via Canvas
-4. **Apply**: Uses `WallpaperManager` to set new bitmap as wallpaper
-5. **Persist**: Settings stored in DataStore, work rescheduled after device reboot
+```mermaid
+graph TD
+    A[User Opens App] --> B[Configure Settings]
+    B --> C[Tap 'Set Wallpaper']
+    C --> D[Generate Initial Wallpaper]
+    D --> E[Schedule Daily WorkManager Task]
+    E --> F[Midnight Arrives]
+    F --> G[WorkManager Triggers WallpaperWorker]
+    G --> H[Fetch Settings from DataStore]
+    H --> I[Calculate Current Day of Year]
+    I --> J[Draw 365 Dots on Canvas]
+    J --> K[Apply as Wallpaper via WallpaperManager]
+    K --> F
+```
 
-## 🧪 Testing
+### Wallpaper Generation Algorithm
+1. Calculate current day of year (1-365/366)
+2. Create bitmap sized to screen dimensions
+3. Calculate 20-column grid layout
+4. For each of 365 positions:
+   - Determine color (past/today/future)
+   - Apply selected shape (circle, rounded, square, pill)
+   - Draw with specified size density
+5. Apply subtle glow effect for visual depth
+6. Set as system wallpaper
 
-See [walkthrough.md](walkthrough.md) for detailed testing instructions including:
-- Manual testing steps
-- ADB commands for date simulation
-- WorkManager verification
+---
 
-## 📝 License
+## 🤝 Contributing
 
-This project is open source and available under the [MIT License](LICENSE).
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on:
+- Reporting bugs
+- Suggesting features
+- Submitting pull requests
+- Code style guidelines
+
+---
+
+## 🐛 Found a Bug?
+
+Please check [existing issues](https://github.com/yourusername/year-dots/issues) first. If your bug hasn't been reported:
+1. Open a [new issue](https://github.com/yourusername/year-dots/issues/new/choose)
+2. Use the bug report template
+3. Include your Android version and device model
+4. Attach screenshots if possible
+
+---
+
+## 📋 Roadmap
+
+### v1.1 (Planned)
+- [ ] Widget support for home screen
+- [ ] Export wallpaper as image
+- [ ] Multiple calendar systems (lunar, ISO week-based)
+- [ ] Animations on wallpaper change
+
+### v1.2 (Planned)
+- [ ] Milestone markers for important dates
+- [ ] Weekly/monthly view modes
+- [ ] Tile/pattern backgrounds
+
+See [open issues](https://github.com/yourusername/year-dots/issues) for feature discussions.
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+**TL;DR:** You can freely use, modify, and distribute this code. Attribution appreciated but not required.
+
+---
+
+## 🙏 Acknowledgments
+
+**Inspiration:**
+- [4,000 Weeks: Time Management for Mortals](https://www.oliverburkeman.com/books) by Oliver Burkeman
+- Memento mori tradition
+- Life calendar visualizations ([WeeklyDots](https://play.google.com/store/apps/details?id=com.weeklydots), [One Dot](https://play.google.com/store/apps/details?id=com.onedot.lifetracker))
+- [Wait But Why's Life Calendar](https://waitbutwhy.com/2014/05/life-weeks.html)
+
+**Special Thanks:**
+- The Jetpack Compose community
+- F-Droid for championing open-source Android apps
+- Everyone who values intentional living
+
+---
 
 ## 👨‍💻 Author
 
 **Krishana**  
-Year Dots v1.0 - January 2026
+*Year Dots v1.0 - January 2026*
 
-## 🙏 Acknowledgments
-
-Inspired by:
-- "4,000 Weeks" philosophy
-- Memento mori tradition
-- Life calendar visualizations (WeeklyDots, One Dot, etc.)
+- 🐛 Report bugs: [GitHub Issues](https://github.com/yourusername/year-dots/issues)
+- 💡 Suggest features: [Feature Requests](https://github.com/yourusername/year-dots/issues/new/choose)
+- 📧 Contact: [Your Email or GitHub Profile]
 
 ---
 
-> "Time is passing. Make it count." ⏳
+## 📊 Stats
+
+<p align="center">
+  <img src="https://img.shields.io/github/stars/yourusername/year-dots?style=social" alt="Stars">
+  <img src="https://img.shields.io/github/forks/yourusername/year-dots?style=social" alt="Forks">
+  <img src="https://img.shields.io/github/watchers/yourusername/year-dots?style=social" alt="Watchers">
+</p>
+
+---
+
+<p align="center">
+  <sub>Made with ❤️ and ⏰ awareness</sub>
+</p>
+
+<p align="center">
+  <i>"The trouble is, you think you have time." - Buddha</i>
+</p>
