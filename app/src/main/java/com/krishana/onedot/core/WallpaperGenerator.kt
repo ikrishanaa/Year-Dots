@@ -88,7 +88,9 @@ object WallpaperGenerator {
         val startY = topPadding + (availableHeight - totalGridHeight) / 2f
 
         val paint = Paint().apply {
-            isAntiAlias = true
+            isAntiAlias = true              // Smooth edges
+            isDither = true                 // Better color gradients
+            isFilterBitmap = true           // High-quality bitmap filtering
             style = Paint.Style.FILL
         }
 
@@ -107,9 +109,24 @@ object WallpaperGenerator {
                     canvas.drawCircle(centerX, centerY, dotRadius, paint)
                 }
                 day == currentDayOfYear -> {
-                    // Today: Filled White (same as past in minimalistic design)
-                    // Optional: Could add a subtle indication if requested, but reference looks uniform
+                    // Today: Filled with subtle glow effect for visual prominence
                     paint.color = themeConfig.todayColor
+                    
+                    // Add subtle outer glow
+                    val glowPaint = Paint().apply {
+                        isAntiAlias = true
+                        isDither = true
+                        isFilterBitmap = true
+                        style = Paint.Style.FILL
+                        color = themeConfig.todayColor
+                        maskFilter = android.graphics.BlurMaskFilter(
+                            dotRadius * 0.3f, 
+                            android.graphics.BlurMaskFilter.Blur.NORMAL
+                        )
+                    }
+                    canvas.drawCircle(centerX, centerY, dotRadius * 1.15f, glowPaint)
+                    
+                    // Draw main dot on top
                     canvas.drawCircle(centerX, centerY, dotRadius, paint)
                 }
                 else -> {

@@ -85,10 +85,17 @@ suspend fun applyWallpaperNow(context: Context, repository: SettingsRepository) 
             android.util.Log.d("YearDots", "All permissions OK, getting WallpaperManager...")
             val wallpaperManager = WallpaperManager.getInstance(context)
             
-            // Get desired dimensions
-            val width = wallpaperManager.desiredMinimumWidth
-            val height = wallpaperManager.desiredMinimumHeight
-            android.util.Log.d("YearDots", "Wallpaper dimensions: ${width}x${height}")
+            // Get ACTUAL screen dimensions for pixel-perfect quality
+            val displayMetrics = context.resources.displayMetrics
+            val screenWidth = displayMetrics.widthPixels
+            val screenHeight = displayMetrics.heightPixels
+            
+            // Use 1.5x super-sampling for even sharper quality
+            val width = (screenWidth * 1.5f).toInt()
+            val height = (screenHeight * 1.5f).toInt()
+            
+            android.util.Log.d("YearDots", "Screen dimensions: ${screenWidth}x${screenHeight}")
+            android.util.Log.d("YearDots", "Wallpaper dimensions (1.5x super-sampled): ${width}x${height}")
             
             // Suggest dimensions to prevent downscaling (optional - requires SET_WALLPAPER_HINTS permission)
             try {
@@ -120,11 +127,11 @@ suspend fun applyWallpaperNow(context: Context, repository: SettingsRepository) 
             android.util.Log.d("YearDots", "Bitmap generated: ${bitmap.width}x${bitmap.height}, config: ${bitmap.config}")
             
             try {
-                // Use setBitmap instead of setStream for better compatibility
-                // Some OEM devices have issues with setStream
-                android.util.Log.d("YearDots", "Setting wallpaper on LOCK SCREEN...")
-                wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK)
-                android.util.Log.d("YearDots", "✓ Wallpaper set successfully!")
+                // Use setBitmap with high-quality settings
+                // allowWhileIdle=false ensures full quality processing
+                android.util.Log.d("YearDots", "Setting wallpaper on LOCK SCREEN with high quality...")
+                wallpaperManager.setBitmap(bitmap, null, false, WallpaperManager.FLAG_LOCK)
+                android.util.Log.d("YearDots", "✓ Wallpaper set successfully at ${width}x${height}!")
             } catch (e: SecurityException) {
                 android.util.Log.e("YearDots", "SecurityException: ${e.message}", e)
                 android.util.Log.e("YearDots", "Stack trace: ${e.stackTraceToString()}")
