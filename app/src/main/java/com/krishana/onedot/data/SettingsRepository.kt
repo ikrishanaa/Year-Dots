@@ -23,14 +23,15 @@ class SettingsRepository(private val context: Context) {
         val TODAY_COLOR_KEY = intPreferencesKey("today_color")
         val FUTURE_COLOR_KEY = intPreferencesKey("future_color")
         val BACKGROUND_COLOR_KEY = intPreferencesKey("background_color")
+        val DOT_SHAPE_KEY = androidx.datastore.preferences.core.stringPreferencesKey("dot_shape")
         val LAST_UPDATE_KEY = longPreferencesKey("last_update_timestamp")
 
-        // Default colors
-        // Default colors
-        const val DEFAULT_PAST_COLOR = 0xFFFFFFFF.toInt()      // White
-        const val DEFAULT_TODAY_COLOR = 0xFFFF6B35.toInt()     // Orange (current day highlight)
-        const val DEFAULT_FUTURE_COLOR = 0xFF333333.toInt()    // Dark Grey (~20% White)
-        const val DEFAULT_BACKGROUND_COLOR = 0xFF000000.toInt() // Black
+        // Default colors (Updated to match requested UI)
+        const val DEFAULT_PAST_COLOR = 0xFFD1D5DB.toInt()      // Light Gray
+        const val DEFAULT_TODAY_COLOR = 0xFFF97316.toInt()     // Orange
+        const val DEFAULT_FUTURE_COLOR = 0xFF262626.toInt()    // Dark Grey
+        const val DEFAULT_BACKGROUND_COLOR = 0xFF050505.toInt() // Almost Black
+        const val DEFAULT_DOT_SHAPE = "circle"
     }
 
     val pastColorFlow: Flow<Int> = context.dataStore.data.map { preferences ->
@@ -47,6 +48,10 @@ class SettingsRepository(private val context: Context) {
 
     val backgroundColorFlow: Flow<Int> = context.dataStore.data.map { preferences ->
         preferences[BACKGROUND_COLOR_KEY] ?: DEFAULT_BACKGROUND_COLOR
+    }
+
+    val dotShapeFlow: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[DOT_SHAPE_KEY] ?: DEFAULT_DOT_SHAPE
     }
 
     val lastUpdateFlow: Flow<Long> = context.dataStore.data.map { preferences ->
@@ -74,6 +79,12 @@ class SettingsRepository(private val context: Context) {
     suspend fun updateBackgroundColor(color: Int) {
         context.dataStore.edit { preferences ->
             preferences[BACKGROUND_COLOR_KEY] = color
+        }
+    }
+
+    suspend fun updateDotShape(shape: String) {
+        context.dataStore.edit { preferences ->
+            preferences[DOT_SHAPE_KEY] = shape
         }
     }
 
@@ -110,5 +121,9 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun getBackgroundColor(): Int {
         return context.dataStore.data.first()[BACKGROUND_COLOR_KEY] ?: DEFAULT_BACKGROUND_COLOR
+    }
+
+    suspend fun getDotShape(): String {
+        return context.dataStore.data.first()[DOT_SHAPE_KEY] ?: DEFAULT_DOT_SHAPE
     }
 }

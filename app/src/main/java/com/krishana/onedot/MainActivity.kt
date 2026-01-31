@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -111,14 +113,16 @@ suspend fun applyWallpaperNow(context: Context, repository: SettingsRepository) 
             val todayColor = repository.getTodayColor()
             val futureColor = repository.getFutureColor()
             val backgroundColor = repository.getBackgroundColor()
+            val dotShape = repository.getDotShape()
             
-            android.util.Log.d("YearDots", "Colors - Past: 0x${pastColor.toString(16)}, Today: 0x${todayColor.toString(16)}, Future: 0x${futureColor.toString(16)}, BG: 0x${backgroundColor.toString(16)}")
+            android.util.Log.d("YearDots", "Colors - Past: 0x${pastColor.toString(16)}, Today: 0x${todayColor.toString(16)}, Future: 0x${futureColor.toString(16)}, BG: 0x${backgroundColor.toString(16)}, Shape: $dotShape")
             
             val themeConfig = WallpaperGenerator.ThemeConfig(
                 pastColor = pastColor,
                 todayColor = todayColor,
                 futureColor = futureColor,
-                backgroundColor = backgroundColor
+                backgroundColor = backgroundColor,
+                dotShape = dotShape
             )
             
             // Generate bitmap
@@ -186,7 +190,7 @@ class MainActivity : ComponentActivity() {
             ).show()
         }
     }
-    
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
@@ -303,12 +307,14 @@ fun SettingsScreen() {
     val savedTodayColor by repository.todayColorFlow.collectAsState(initial = SettingsRepository.DEFAULT_TODAY_COLOR)
     val savedFutureColor by repository.futureColorFlow.collectAsState(initial = SettingsRepository.DEFAULT_FUTURE_COLOR)
     val savedBackgroundColor by repository.backgroundColorFlow.collectAsState(initial = SettingsRepository.DEFAULT_BACKGROUND_COLOR)
+    val savedDotShape by repository.dotShapeFlow.collectAsState(initial = SettingsRepository.DEFAULT_DOT_SHAPE)
 
     // Pending colors (not saved yet)
     var pendingPastColor by remember { mutableStateOf<Int?>(null) }
     var pendingTodayColor by remember { mutableStateOf<Int?>(null) }
     var pendingFutureColor by remember { mutableStateOf<Int?>(null) }
     var pendingBackgroundColor by remember { mutableStateOf<Int?>(null) }
+    var pendingDotShape by remember { mutableStateOf<String?>(null) }
 
     // Color picker dialogs
     var showPastColorPicker by remember { mutableStateOf(false) }
@@ -324,12 +330,14 @@ fun SettingsScreen() {
     val currentTodayColor = pendingTodayColor ?: savedTodayColor
     val currentFutureColor = pendingFutureColor ?: savedFutureColor
     val currentBackgroundColor = pendingBackgroundColor ?: savedBackgroundColor
+    val currentDotShape = pendingDotShape ?: savedDotShape
 
     // Check if there are unsaved changes
     val hasChanges = pendingPastColor != null || 
                      pendingTodayColor != null || 
                      pendingFutureColor != null || 
-                     pendingBackgroundColor != null
+                     pendingBackgroundColor != null ||
+                     pendingDotShape != null
 
     var showDebugInfo by remember { mutableStateOf(false) }
 
@@ -501,6 +509,79 @@ fun SettingsScreen() {
             }
         }
 
+        // Dot Shape Selection
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "Shape",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Shape Options Row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    ShapeOptionItem(
+                        selected = currentDotShape == "circle",
+                        label = "Dot",
+                        onClick = { pendingDotShape = "circle" }
+                    ) { color ->
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(color, CircleShape)
+                        )
+                    }
+                    
+                    ShapeOptionItem(
+                        selected = currentDotShape == "rounded",
+                        label = "Rounded",
+                        onClick = { pendingDotShape = "rounded" }
+                    ) { color ->
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(color, androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+                        )
+                    }
+                    
+                    ShapeOptionItem(
+                        selected = currentDotShape == "square",
+                        label = "Square",
+                        onClick = { pendingDotShape = "square" }
+                    ) { color ->
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(color, androidx.compose.foundation.shape.RoundedCornerShape(2.dp))
+                        )
+                    }
+                    
+                    ShapeOptionItem(
+                        selected = currentDotShape == "pill",
+                        label = "Pill",
+                        onClick = { pendingDotShape = "pill" }
+                    ) { color ->
+                        Box(
+                            modifier = Modifier
+                                .size(width = 40.dp, height = 24.dp)
+                                .background(color, CircleShape)
+                        )
+                    }
+                }
+            }
+        }
+
         // Unsaved changes indicator
         if (hasChanges) {
             Card(
@@ -542,6 +623,7 @@ fun SettingsScreen() {
                 pendingTodayColor = SettingsRepository.DEFAULT_TODAY_COLOR
                 pendingFutureColor = SettingsRepository.DEFAULT_FUTURE_COLOR
                 pendingBackgroundColor = SettingsRepository.DEFAULT_BACKGROUND_COLOR
+                pendingDotShape = SettingsRepository.DEFAULT_DOT_SHAPE
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -623,6 +705,7 @@ fun SettingsScreen() {
                                 pendingTodayColor?.let { repository.updateTodayColor(it) }
                                 pendingFutureColor?.let { repository.updateFutureColor(it) }
                                 pendingBackgroundColor?.let { repository.updateBackgroundColor(it) }
+                                pendingDotShape?.let { repository.updateDotShape(it) }
                                 
                                 // Apply wallpaper immediately (synchronous)
                                 applyWallpaperNow(context, repository)
@@ -632,6 +715,7 @@ fun SettingsScreen() {
                                 pendingTodayColor = null
                                 pendingFutureColor = null
                                 pendingBackgroundColor = null
+                                pendingDotShape = null
                                 
                                 showSaveDialog = false
                                 
@@ -823,6 +907,47 @@ fun DebugInfoRow(label: String, value: String, valueColor: Color? = null) {
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium,
             color = valueColor ?: MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Composable
+fun ShapeOptionItem(
+    selected: Boolean,
+    label: String,
+    onClick: () -> Unit,
+    icon: @Composable (Color) -> Unit
+) {
+    val borderColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
+    val backgroundColor = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+    
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(4.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(72.dp, 60.dp) // Card size
+                .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                .background(backgroundColor)
+                .then(
+                    if (selected) Modifier.border(2.dp, borderColor, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                    else Modifier
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            // Icon preview
+            icon(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
         )
     }
 }
