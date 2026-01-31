@@ -570,8 +570,9 @@ fun SettingsScreen() {
                     }
                     
                     Spacer(modifier = Modifier
-                        .width(0.5.dp)
-                        .fillMaxHeight()
+                        .width(1.dp)
+                        .height(34.dp)
+                        .align(Alignment.CenterVertically)
                         .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
                     )
                     
@@ -594,7 +595,8 @@ fun SettingsScreen() {
                     
                     Spacer(modifier = Modifier
                         .width(1.dp)
-                        .fillMaxHeight()
+                        .height(34.dp)
+                        .align(Alignment.CenterVertically)
                         .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
                     )
                     
@@ -617,7 +619,8 @@ fun SettingsScreen() {
                     
                     Spacer(modifier = Modifier
                         .width(1.dp)
-                        .fillMaxHeight()
+                        .height(34.dp)
+                        .align(Alignment.CenterVertically)
                         .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
                     )
                     
