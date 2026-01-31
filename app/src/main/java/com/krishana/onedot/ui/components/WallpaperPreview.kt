@@ -26,13 +26,14 @@ fun WallpaperPreview(
     val currentDay = 113 // Middle of the grid to show progress clearly
     
     // Calculate dot size based on density
-    // For 15x15 grid, we need slightly smaller dots to fit comfortably
+    // For 15x15 grid, available width is ~21dp per cell.
+    // We can go larger to fill the space better.
     val dotSize = when (dotDensity) {
-        0 -> 4.dp  // Tiny
-        1 -> 6.dp  // Small
-        2 -> 8.dp  // Medium
-        3 -> 10.dp // Large
-        else -> 8.dp
+        0 -> 9.dp   // Tiny (was 4.dp)
+        1 -> 12.dp   // Small (was 6.dp)
+        2 -> 15.dp  // Medium (was 8.dp)
+        3 -> 18.dp  // Large (was 10.dp)
+        else -> 12.dp
     }
     
     // Get shape object based on dotShape name
