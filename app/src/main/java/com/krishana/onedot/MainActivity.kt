@@ -25,6 +25,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -33,6 +34,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.shape.RoundedCornerShape
 import com.krishana.onedot.core.WallpaperGenerator
 import com.krishana.onedot.data.SettingsRepository
 import com.krishana.onedot.ui.components.AboutDialog
@@ -125,15 +128,17 @@ suspend fun applyWallpaperNow(context: Context, repository: SettingsRepository) 
             val futureColor = repository.getFutureColor()
             val backgroundColor = repository.getBackgroundColor()
             val dotShape = repository.getDotShape()
+            val dotDensity = repository.getDotDensity()
             
-            android.util.Log.d("YearDots", "Colors - Past: 0x${pastColor.toString(16)}, Today: 0x${todayColor.toString(16)}, Future: 0x${futureColor.toString(16)}, BG: 0x${backgroundColor.toString(16)}, Shape: $dotShape")
+            android.util.Log.d("YearDots", "Colors - Past: 0x${pastColor.toString(16)}, Today: 0x${todayColor.toString(16)}, Future: 0x${futureColor.toString(16)}, BG: 0x${backgroundColor.toString(16)}, Shape: $dotShape, Density: $dotDensity")
             
             val themeConfig = WallpaperGenerator.ThemeConfig(
                 pastColor = pastColor,
                 todayColor = todayColor,
                 futureColor = futureColor,
                 backgroundColor = backgroundColor,
-                dotShape = dotShape
+                dotShape = dotShape,
+                dotDensity = dotDensity
             )
             
             // Generate bitmap
@@ -319,6 +324,7 @@ fun SettingsScreen() {
     val savedFutureColor by repository.futureColorFlow.collectAsState(initial = SettingsRepository.DEFAULT_FUTURE_COLOR)
     val savedBackgroundColor by repository.backgroundColorFlow.collectAsState(initial = SettingsRepository.DEFAULT_BACKGROUND_COLOR)
     val savedDotShape by repository.dotShapeFlow.collectAsState(initial = SettingsRepository.DEFAULT_DOT_SHAPE)
+    val savedDotDensity by repository.dotDensityFlow.collectAsState(initial = SettingsRepository.DEFAULT_DOT_DENSITY)
 
     // Pending colors (not saved yet)
     var pendingPastColor by remember { mutableStateOf<Int?>(null) }
@@ -326,6 +332,7 @@ fun SettingsScreen() {
     var pendingFutureColor by remember { mutableStateOf<Int?>(null) }
     var pendingBackgroundColor by remember { mutableStateOf<Int?>(null) }
     var pendingDotShape by remember { mutableStateOf<String?>(null) }
+    var pendingDotDensity by remember { mutableStateOf<Int?>(null) }
 
     // Color picker dialogs
     var showPastColorPicker by remember { mutableStateOf(false) }
@@ -342,13 +349,15 @@ fun SettingsScreen() {
     val currentFutureColor = pendingFutureColor ?: savedFutureColor
     val currentBackgroundColor = pendingBackgroundColor ?: savedBackgroundColor
     val currentDotShape = pendingDotShape ?: savedDotShape
+    val currentDotDensity = pendingDotDensity ?: savedDotDensity
 
     // Check if there are unsaved changes
     val hasChanges = pendingPastColor != null || 
                      pendingTodayColor != null || 
                      pendingFutureColor != null || 
                      pendingBackgroundColor != null ||
-                     pendingDotShape != null
+                     pendingDotShape != null ||
+                     pendingDotDensity != null
 
     var showAboutDialog by remember { mutableStateOf(false) }
 
@@ -357,224 +366,368 @@ fun SettingsScreen() {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.systemBars)
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 16.dp)
+            .padding(horizontal = 20.dp)
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Spacer(modifier = Modifier.height(8.dp))
+        
         // Header
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "Year Dots",
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontSize = 36.sp
             )
-            IconButton(onClick = { showAboutDialog = true }) {
+            IconButton(
+                onClick = { showAboutDialog = true },
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+            ) {
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = "About",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(28.dp)
                 )
             }
         }
 
-
-        // Live Preview Card
+        // Preview Card
         Card(
             modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(6.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Section Label
                 Text(
-                    text = "Preview",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    text = "PREVIEW",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.5.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(vertical = 20.dp)
                 )
                 
-                // Mini preview grid (7x7)
-                WallpaperPreview(
-                    pastColor = Color(currentPastColor),
-                    todayColor = Color(currentTodayColor),
-                    futureColor = Color(currentFutureColor),
-                    backgroundColor = Color(currentBackgroundColor)
-                )
-            }
-        }
-
-        // Color Settings Card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = "Color Settings",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-
-                ColorSettingRow(
-                    label = "Past Days",
-                    color = Color(currentPastColor),
-                    onClick = { showPastColorPicker = true }
-                )
-                
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-                ColorSettingRow(
-                    label = "Current Day",
-                    color = Color(currentTodayColor),
-                    onClick = { showTodayColorPicker = true }
-                )
-                
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-                ColorSettingRow(
-                    label = "Future Days",
-                    color = Color(currentFutureColor),
-                    onClick = { showFutureColorPicker = true }
-                )
-                
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-                ColorSettingRow(
-                    label = "Background",
-                    color = Color(currentBackgroundColor),
-                    onClick = { showBackgroundColorPicker = true }
-                )
-            }
-        }
-
-        // Dot Shape Selection
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = "Shape",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Shape Options Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                // Preview container with background
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 0.dp)
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(Color(currentBackgroundColor)),
+                    contentAlignment = Alignment.Center
                 ) {
-                    ShapeOptionItem(
-                        selected = currentDotShape == "circle",
-                        label = "Dot",
-                        onClick = { pendingDotShape = "circle" }
-                    ) { color ->
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .background(color, CircleShape)
+                    WallpaperPreview(
+                        pastColor = Color(currentPastColor),
+                        todayColor = Color(currentTodayColor),
+                        futureColor = Color(currentFutureColor),
+                        backgroundColor = Color.Transparent
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
+
+        // Color Palette Card
+        Card(
+           modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Text(
+                    text = "COLOR PALETTE",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.5.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(bottom = 20.dp, start = 4.dp)
+                )
+                
+                // 2x2 Grid
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // Past Days
+                        ColorPaletteItem(
+                            modifier = Modifier.weight(1f),
+                            topLabel = "PAST",
+                            bottomLabel = "Days",
+                            color = Color(currentPastColor),
+                            onClick = { showPastColorPicker = true }
+                        )
+                        
+                        // Today
+                        ColorPaletteItem(
+                            modifier = Modifier.weight(1f),
+                            topLabel = "TODAY",
+                            bottomLabel = "Current",
+                            color = Color(currentTodayColor),
+                            onClick = { showTodayColorPicker = true },
+                            hasGlow = true
                         )
                     }
                     
-                    ShapeOptionItem(
-                        selected = currentDotShape == "rounded",
-                        label = "Rounded",
-                        onClick = { pendingDotShape = "rounded" }
-                    ) { color ->
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .background(color, androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // Future Days
+                        ColorPaletteItem(
+                            modifier = Modifier.weight(1f),
+                            topLabel = "FUTURE",
+                            bottomLabel = "Days",
+                            color = Color(currentFutureColor),
+                            onClick = { showFutureColorPicker = true }
                         )
-                    }
-                    
-                    ShapeOptionItem(
-                        selected = currentDotShape == "square",
-                        label = "Square",
-                        onClick = { pendingDotShape = "square" }
-                    ) { color ->
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .background(color, androidx.compose.foundation.shape.RoundedCornerShape(2.dp))
-                        )
-                    }
-                    
-                    ShapeOptionItem(
-                        selected = currentDotShape == "pill",
-                        label = "Pill",
-                        onClick = { pendingDotShape = "pill" }
-                    ) { color ->
-                        Box(
-                            modifier = Modifier
-                                .size(width = 40.dp, height = 24.dp)
-                                .background(color, CircleShape)
+                        
+                        // Background
+                        ColorPaletteItem(
+                            modifier = Modifier.weight(1f),
+                            topLabel = "BASE",
+                            bottomLabel = "Theme",
+                            color = Color(currentBackgroundColor),
+                            onClick = { showBackgroundColorPicker = true },
+                            hasBorder = true
                         )
                     }
                 }
             }
         }
 
-        // Unsaved changes indicator
-        if (hasChanges) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            ) {
+        // Shape Selection Card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
                 Text(
-                    text = "⚠️ You have unsaved changes",
-                    modifier = Modifier.padding(12.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    text = "SHAPE",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.5.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(bottom = 20.dp, start = 4.dp)
                 )
+                
+                // Horizontal shape selector
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.3f))
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // Dot
+                    ShapeSelectorItem(
+                        modifier = Modifier.weight(1f),
+                        selected = currentDotShape == "circle",
+                        onClick = { pendingDotShape = "circle" }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .background(
+                                    if (currentDotShape == "circle") MaterialTheme.colorScheme.onSurface 
+                                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                    CircleShape
+                                )
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier
+                        .width(1.dp)
+                        .height(32.dp)
+                        .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
+                    )
+                    
+                    // Rounded
+                    ShapeSelectorItem(
+                        modifier = Modifier.weight(1f),
+                        selected = currentDotShape == "rounded",
+                        onClick = { pendingDotShape = "rounded" }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .background(
+                                    if (currentDotShape == "rounded") MaterialTheme.colorScheme.onSurface 
+                                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                    RoundedCornerShape(6.dp)
+                                )
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier
+                        .width(1.dp)
+                        .height(32.dp)
+                        .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
+                    )
+                    
+                    // Square
+                    ShapeSelectorItem(
+                        modifier = Modifier.weight(1f),
+                        selected = currentDotShape == "square",
+                        onClick = { pendingDotShape = "square" }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .background(
+                                    if (currentDotShape == "square") MaterialTheme.colorScheme.onSurface 
+                                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                    RoundedCornerShape(2.dp)
+                                )
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier
+                        .width(1.dp)
+                        .height(32.dp)
+                        .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
+                    )
+                    
+                    // Pill
+                    ShapeSelectorItem(
+                        modifier = Modifier.weight(1f),
+                        selected = currentDotShape == "pill",
+                        onClick = { pendingDotShape = "pill" }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .background(
+                                    if (currentDotShape == "pill") MaterialTheme.colorScheme.onSurface 
+                                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                    RoundedCornerShape(0.dp)
+                                )
+                        )
+                    }
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        // Size Section
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Text(
+                    text = "SIZE",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.5.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(start = 4.dp, bottom = 20.dp)
+                )
+                
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.3f))
+                        .padding(16.dp)
+                ) {
+                    Column {
+                        // Slider
+                        Slider(
+                            value = currentDotDensity.toFloat(),
+                            onValueChange = { pendingDotDensity = it.toInt() },
+                            valueRange = 0f..3f,
+                            steps = 2,
+                            colors = SliderDefaults.colors(
+                                thumbColor = MaterialTheme.colorScheme.surface,
+                                activeTrackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                inactiveTrackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        // Labels
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            val labels = listOf("Tiny", "Small", "Medium", "Large")
+                            labels.forEachIndexed { index, label ->
+                                Text(
+                                    text = label.uppercase(),
+                                    fontSize = 10.sp,
+                                    fontWeight = if (index == currentDotDensity) FontWeight.Bold else FontWeight.SemiBold,
+                                    letterSpacing = 0.8.sp,
+                                    color = if (index == currentDotDensity) 
+                                        MaterialTheme.colorScheme.onSurface 
+                                    else 
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         // Save & Apply Button
-        Button(
-            onClick = { showSaveDialog = true },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = hasChanges
-        ) {
-            Icon(
-                imageVector = Icons.Default.Refresh,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Save & Apply to Lockscreen")
+        if (hasChanges) {
+            Button(
+                onClick = { showSaveDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "Save & Apply to Lockscreen",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
-
-        // Reset to Defaults Button
-        OutlinedButton(
-            onClick = {
-                pendingPastColor = SettingsRepository.DEFAULT_PAST_COLOR
-                pendingTodayColor = SettingsRepository.DEFAULT_TODAY_COLOR
-                pendingFutureColor = SettingsRepository.DEFAULT_FUTURE_COLOR
-                pendingBackgroundColor = SettingsRepository.DEFAULT_BACKGROUND_COLOR
-                pendingDotShape = SettingsRepository.DEFAULT_DOT_SHAPE
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Reset to Defaults")
-        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
     }
 
     // Color Picker Dialogs
@@ -652,6 +805,7 @@ fun SettingsScreen() {
                                 pendingFutureColor?.let { repository.updateFutureColor(it) }
                                 pendingBackgroundColor?.let { repository.updateBackgroundColor(it) }
                                 pendingDotShape?.let { repository.updateDotShape(it) }
+                                pendingDotDensity?.let { repository.updateDotDensity(it) }
                                 
                                 // Apply wallpaper immediately (synchronous)
                                 applyWallpaperNow(context, repository)
@@ -662,6 +816,7 @@ fun SettingsScreen() {
                                 pendingFutureColor = null
                                 pendingBackgroundColor = null
                                 pendingDotShape = null
+                                pendingDotDensity = null
                                 
                                 showSaveDialog = false
                                 
@@ -693,3 +848,92 @@ fun SettingsScreen() {
     }
 }
 
+
+// Modern Color Palette Item
+@Composable
+fun ColorPaletteItem(
+    modifier: Modifier = Modifier,
+    topLabel: String,
+    bottomLabel: String,
+    color: Color,
+    onClick: () -> Unit,
+    hasGlow: Boolean = false,
+    hasBorder: Boolean = false
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.3f))
+            .clickable(onClick = onClick)
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = topLabel,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.8.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    fontSize = 10.sp
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = bottomLabel,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 17.sp
+                )
+            }
+            
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .then(
+                        if (hasBorder) Modifier.border(
+                            1.dp,
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                            CircleShape
+                        ) else Modifier
+                    )
+                    .clip(CircleShape)
+                    .background(color)
+                    .then(
+                        if (hasGlow) Modifier.shadow(
+                            elevation = 12.dp,
+                            shape = CircleShape,
+                            ambientColor = color.copy(alpha = 0.4f),
+                            spotColor = color.copy(alpha = 0.4f)
+                        ) else Modifier
+                    )
+            )
+        }
+    }
+}
+
+// Modern Shape Selector Item  
+@Composable
+fun ShapeSelectorItem(
+    modifier: Modifier = Modifier,
+    selected: Boolean,
+    onClick: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                if (selected) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                else Color.Transparent
+            )
+            .clickable(onClick = onClick)
+            .padding(vertical = 16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        content()
+    }
+}

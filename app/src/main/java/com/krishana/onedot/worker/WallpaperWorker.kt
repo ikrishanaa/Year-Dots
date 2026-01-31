@@ -30,12 +30,16 @@ class WallpaperWorker(
             val todayColor = repository.todayColorFlow.first()
             val futureColor = repository.futureColorFlow.first()
             val backgroundColor = repository.backgroundColorFlow.first()
+            val dotShape = repository.dotShapeFlow.first()
+            val dotDensity = repository.dotDensityFlow.first()
 
             val themeConfig = WallpaperGenerator.ThemeConfig(
                 pastColor = pastColor,
                 todayColor = todayColor,
                 futureColor = futureColor,
-                backgroundColor = backgroundColor
+                backgroundColor = backgroundColor,
+                dotShape = dotShape,
+                dotDensity = dotDensity
             )
 
             // Get device screen dimensions

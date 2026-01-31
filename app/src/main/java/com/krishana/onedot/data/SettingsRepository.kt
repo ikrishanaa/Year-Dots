@@ -24,6 +24,7 @@ class SettingsRepository(private val context: Context) {
         val FUTURE_COLOR_KEY = intPreferencesKey("future_color")
         val BACKGROUND_COLOR_KEY = intPreferencesKey("background_color")
         val DOT_SHAPE_KEY = androidx.datastore.preferences.core.stringPreferencesKey("dot_shape")
+        val DOT_DENSITY_KEY = intPreferencesKey("dot_density")
         val LAST_UPDATE_KEY = longPreferencesKey("last_update_timestamp")
 
         // Default colors (Updated to match requested UI)
@@ -32,6 +33,7 @@ class SettingsRepository(private val context: Context) {
         const val DEFAULT_FUTURE_COLOR = 0xFF262626.toInt()    // Dark Grey
         const val DEFAULT_BACKGROUND_COLOR = 0xFF050505.toInt() // Almost Black
         const val DEFAULT_DOT_SHAPE = "circle"
+        const val DEFAULT_DOT_DENSITY = 1 // 0=Tiny, 1=Small, 2=Medium, 3=Large
     }
 
     val pastColorFlow: Flow<Int> = context.dataStore.data.map { preferences ->
@@ -52,6 +54,10 @@ class SettingsRepository(private val context: Context) {
 
     val dotShapeFlow: Flow<String> = context.dataStore.data.map { preferences ->
         preferences[DOT_SHAPE_KEY] ?: DEFAULT_DOT_SHAPE
+    }
+
+    val dotDensityFlow: Flow<Int> = context.dataStore.data.map { preferences ->
+        preferences[DOT_DENSITY_KEY] ?: DEFAULT_DOT_DENSITY
     }
 
     val lastUpdateFlow: Flow<Long> = context.dataStore.data.map { preferences ->
@@ -85,6 +91,12 @@ class SettingsRepository(private val context: Context) {
     suspend fun updateDotShape(shape: String) {
         context.dataStore.edit { preferences ->
             preferences[DOT_SHAPE_KEY] = shape
+        }
+    }
+
+    suspend fun updateDotDensity(density: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[DOT_DENSITY_KEY] = density
         }
     }
 
@@ -125,5 +137,9 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun getDotShape(): String {
         return context.dataStore.data.first()[DOT_SHAPE_KEY] ?: DEFAULT_DOT_SHAPE
+    }
+
+    suspend fun getDotDensity(): Int {
+        return context.dataStore.data.first()[DOT_DENSITY_KEY] ?: DEFAULT_DOT_DENSITY
     }
 }

@@ -17,7 +17,8 @@ object WallpaperGenerator {
         val todayColor: Int,
         val futureColor: Int,
         val backgroundColor: Int,
-        val dotShape: String = "circle" // "circle" or "square"
+        val dotShape: String = "circle", // "circle" or "square"
+        val dotDensity: Int = 1 // 0=Tiny, 1=Small, 2=Medium, 3=Large
     )
 
     data class BatteryInfo(
@@ -78,9 +79,19 @@ object WallpaperGenerator {
         // Use the smaller dimension to ensure everything fits
         val cellSize = min(cellWidth, cellHeight)
         
+        // Apply density multiplier based on user preference
+        // Tiny=0.70x, Small=1.00x, Medium=1.30x, Large=1.60x
+        val densityMultiplier = when (themeConfig.dotDensity) {
+            0 -> 0.70f  // Tiny
+            1 -> 1.00f  // Small (default)
+            2 -> 1.30f  // Medium
+            3 -> 1.60f  // Large
+            else -> 1.00f
+        }
+        
         // Dot size (radius for circle, half-width for square compatibility)
         // 28% of cell size as radius means diameter is 56% of cell size
-        val dotRadius = cellSize * 0.28f
+        val dotRadius = cellSize * 0.28f * densityMultiplier
         val dotDiameter = dotRadius * 2
         
         // Recalculate actual grid dimensions
