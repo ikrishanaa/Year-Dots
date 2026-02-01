@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiple calendar systems (lunar, ISO week-based)
 - Milestone markers for important dates
 
+## [1.30.3] - 2026-02-01
+
+### Fixed
+- Fixed APK installation error on newer Android versions by switching to V2 signing scheme (apksigner).
+
 ## [1.30.2] - 2026-02-01
 
 ### Fixed

@@ -56,15 +56,31 @@ jobs:
       if: env.KEYSTORE_PASSWORD != ''
       run: |
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
-        # Loop through all APKs and sign them
+        
+        # Find build-tools path
+        BUILD_TOOLS_VERSION=$(ls $ANDROID_HOME/build-tools/ | sort -r | head -n 1)
+        ANDROID_BUILD_TOOLS="$ANDROID_HOME/build-tools/$BUILD_TOOLS_VERSION"
+        ZIPALIGN="$ANDROID_BUILD_TOOLS/zipalign"
+        APKSIGNER="$ANDROID_BUILD_TOOLS/apksigner"
+        
+        echo "Using build-tools: $BUILD_TOOLS_VERSION"
+        
+        # Loop through all APKs
         find app/build/outputs/apk/release -name "*.apk" -print0 | while IFS= read -r -d '' file; do
-          echo "Signing $file..."
-          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-            -keystore release.keystore \
-            -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
-            -keypass "${{ secrets.KEY_PASSWORD }}" \
-            "$file" \
-            ${{ secrets.KEY_ALIAS }}
+          if [[ "$file" == *"unsigned"* ]]; then
+              echo "Processing $file..."
+              
+              # 1. Zipalign
+              "$ZIPALIGN" -v -p 4 "$file" "$file.aligned"
+              mv "$file.aligned" "$file"
+              
+              # 2. Sign with apksigner (V2 scheme)
+              "$APKSIGNER" sign --ks release.keystore \
+                --ks-pass pass:"${{ secrets.KEYSTORE_PASSWORD }}" \
+                --ks-key-alias "${{ secrets.KEY_ALIAS }}" \
+                --key-pass pass:"${{ secrets.KEY_PASSWORD }}" \
+                "$file"
+          fi
         done
         rm release.keystore
         
