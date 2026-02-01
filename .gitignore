@@ -16,7 +16,7 @@ out/
 app/release/
 
 # Local configuration file
-gradle.properties
+local.properties
 
 # APK files
 *.apk
