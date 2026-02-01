@@ -11,8 +11,8 @@ android {
         applicationId = "com.krishana.onedot"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.30.3"
+        versionCode = 5
+        versionName = "1.30.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -29,6 +29,16 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            // Read keystore location from env var or default to 'release.keystore' in project root
+            storeFile = file(System.getenv("KEYSTORE_FILE") ?: "release.keystore")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -36,6 +46,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

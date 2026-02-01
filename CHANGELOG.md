@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiple calendar systems (lunar, ISO week-based)
 - Milestone markers for important dates
 
+## [1.30.4] - 2026-02-01
+
+### Fixed
+- Migrated signing logic to Gradle for standard, reliable V1+V2 signatures. This fixes the "app not installed" error permanently.
+
 ## [1.30.3] - 2026-02-01
 
 ### Fixed

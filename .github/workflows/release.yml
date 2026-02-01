@@ -45,62 +45,36 @@ jobs:
           echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
         fi
         
-    - name: Build release APK
-      run: ./gradlew assembleRelease --stacktrace
-      env:
-        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        
-    - name: Sign APKs
-      if: env.KEYSTORE_PASSWORD != ''
+    - name: Decode Keystore
       run: |
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
         
-        # Find build-tools path
-        BUILD_TOOLS_VERSION=$(ls $ANDROID_HOME/build-tools/ | sort -r | head -n 1)
-        ANDROID_BUILD_TOOLS="$ANDROID_HOME/build-tools/$BUILD_TOOLS_VERSION"
-        ZIPALIGN="$ANDROID_BUILD_TOOLS/zipalign"
-        APKSIGNER="$ANDROID_BUILD_TOOLS/apksigner"
-        
-        echo "Using build-tools: $BUILD_TOOLS_VERSION"
-        
-        # Loop through all APKs
-        find app/build/outputs/apk/release -name "*.apk" -print0 | while IFS= read -r -d '' file; do
-          if [[ "$file" == *"unsigned"* ]]; then
-              echo "Processing $file..."
-              
-              # 1. Zipalign
-              "$ZIPALIGN" -v -p 4 "$file" "$file.aligned"
-              mv "$file.aligned" "$file"
-              
-              # 2. Sign with apksigner (V2 scheme)
-              "$APKSIGNER" sign --ks release.keystore \
-                --ks-pass pass:"${{ secrets.KEYSTORE_PASSWORD }}" \
-                --ks-key-alias "${{ secrets.KEY_ALIAS }}" \
-                --key-pass pass:"${{ secrets.KEY_PASSWORD }}" \
-                "$file"
-          fi
-        done
-        rm release.keystore
+    - name: Build and Sign APKs
+      run: ./gradlew assembleRelease --stacktrace
+      env:
+        KEYSTORE_FILE: ../release.keystore
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         
     - name: Rename APKs
       run: |
         # Loop through all generated APKs
         find app/build/outputs/apk/release -name "*.apk" -print0 | while IFS= read -r -d '' file; do
-          if [[ "$file" == *"unsigned"* ]]; then
-             # Extract abi name (e.g., arm64-v8a, universal, etc.) or default to universal if not found
-             if [[ "$file" =~ app-([a-zA-Z0-9_-]+)-release-unsigned.apk ]]; then
-               ABI="${BASH_REMATCH[1]}"
-             elif [[ "$file" =~ app-release-unsigned.apk ]]; then
-               ABI="universal"
-             else
-               ABI="unknown"
-             fi
-             
-             # Rename to YearDots-v1.0.0-abi.apk
-             mv "$file" "app/build/outputs/apk/release/YearDots-${{ steps.version.outputs.VERSION }}-$ABI.apk"
+          # Skip if it's already renamed or doesn't match expected pattern
+          if [[ "$file" == *"YearDots"* ]]; then continue; fi
+          
+          # Extract abi name
+          if [[ "$file" =~ app-([a-zA-Z0-9_-]+)-release.apk ]]; then
+            ABI="${BASH_REMATCH[1]}"
+          elif [[ "$file" =~ app-release.apk ]]; then
+             ABI="universal"
+          else
+            ABI="unknown"
           fi
+             
+          # Rename to YearDots-vX.Y.Z-abi.apk
+          mv "$file" "app/build/outputs/apk/release/YearDots-${{ steps.version.outputs.VERSION }}-$ABI.apk"
         done
         
     - name: Generate changelog
