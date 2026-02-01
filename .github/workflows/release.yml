@@ -52,16 +52,20 @@ jobs:
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         
-    - name: Sign APK
+    - name: Sign APKs
       if: env.KEYSTORE_PASSWORD != ''
       run: |
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
-        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-          -keystore release.keystore \
-          -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
-          -keypass "${{ secrets.KEY_PASSWORD }}" \
-          app/build/outputs/apk/release/app-release-unsigned.apk \
-          ${{ secrets.KEY_ALIAS }}
+        # Loop through all APKs and sign them
+        find app/build/outputs/apk/release -name "*.apk" -print0 | while IFS= read -r -d '' file; do
+          echo "Signing $file..."
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+            -keystore release.keystore \
+            -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
+            -keypass "${{ secrets.KEY_PASSWORD }}" \
+            "$file" \
+            ${{ secrets.KEY_ALIAS }}
+        done
         rm release.keystore
         
     - name: Rename APKs
