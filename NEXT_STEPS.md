@@ -22,34 +22,17 @@ This guide provides a clear, actionable roadmap to take Year Dots from local dev
 
 ## 🔴 Critical - Do These First
 
-> **💡 Git Safety Note:** NEXT_STEPS.md (this file) along with all other documentation files (README.md, CONTRIBUTING.md, etc.) **SHOULD be committed** to your repository. They help users and contributors get started. See [SECURITY_AUDIT.md](SECURITY_AUDIT.md) for what to never commit (keystores, secrets, local.properties).
+> **💡 Git Safety Note:** NEXT_STEPS.md (this file) along with all other documentation files (README.md, CONTRIBUTING.md, etc.) **SHOULD be committed** to your repository. They help users and contributors get started. Check `.gitignore` for what to never commit (keystores, secrets, local.properties).
 
-### 1. Create GitHub Repository
+### 1. ✅ GitHub Repository Setup - COMPLETED
 
-**Time:** 10 minutes
+The repository is now live at: https://github.com/ikrishanaa/Year-Dots
 
-```bash
-# Initialize git (if not already done)
-cd /home/ikrishnaa/Desktop/Onedot
-git init
-git add .
-git commit -m "Initial commit: Year Dots v1.0.0"
-
-# Create repository on GitHub, then:
-git remote add origin https://github.com/ikrishanaa/Year-Dots.git
-git branch -M main
-git push -u origin main
-```
-
-**Then update these files** with your actual GitHub username:
+All documentation files have been updated with the correct GitHub username (`ikrishanaa`) in:
 - `README.md` (all badge URLs and links)
 - `CONTRIBUTING.md` (issue/discussion links)
 - `.github/ISSUE_TEMPLATE/config.yml`
 - `CHANGELOG.md` (version comparison links)
-
-**Find & Replace:**
-- Find: `yourusername`
-- Replace: `your-actual-github-username`
 
 ---
 
@@ -59,7 +42,8 @@ git push -u origin main
 **⚠️ CRITICAL:** This is required to sign release APKs
 
 ```bash
-cd /home/ikrishnaa/Desktop/Onedot
+# Navigate to your project directory
+cd Year-Dots
 
 # Generate keystore
 keytool -genkey -v -keystore year-dots-release.keystore \
@@ -101,7 +85,8 @@ Add these 4 secrets:
 
 **Installation on device:**
 ```bash
-cd /home/ikrishnaa/Desktop/Onedot
+# Navigate to your project directory
+cd Year-Dots
 ./gradlew assembleDebug
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
@@ -184,7 +169,8 @@ android {
 ### 8. Test Build Locally
 
 ```bash
-cd /home/ikrishnaa/Desktop/Onedot
+# Navigate to your Year-Dots project directory
+cd Year-Dots
 
 # Build debug APK
 ./gradlew assembleDebug
