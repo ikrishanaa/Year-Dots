@@ -1,0 +1,10 @@
+Initial release:
+• 365-dot calendar wallpaper with automatic daily updates
+• Four dot shapes: Circle, Rounded, Square, Pill
+• Four size densities: Tiny, Small, Medium, Large
+• Full color customization (past, today, future, background)
+• Live preview of wallpaper before applying
+• AMOLED-friendly dark themes
+• WorkManager integration for reliable midnight updates
+• DataStore for persistent settings
+• Boot receiver to reschedule updates after device restart
