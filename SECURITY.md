@@ -14,7 +14,9 @@ Currently supported versions of Year Dots:
 
 If you discover a security vulnerability, please report it via:
 
-**Email:** [Your Email Address]
+**Email:** krishanaindia773@gmail.com
+
+**GitHub Security Advisories:** https://github.com/ikrishanaa/Year-Dots/security/advisories/new
 
 **What to include:**
 - Type of vulnerability

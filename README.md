@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white" alt="Language">
   <img src="https://img.shields.io/badge/Min%20SDK-26%20(Android%208.0)-orange" alt="Min SDK">
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
-  <img src="https://img.shields.io/github/v/release/yourusername/year-dots?include_prereleases" alt="Release">
+  <img src="https://img.shields.io/github/v/release/ikrishanaa/Year-Dots?include_prereleases" alt="Release">
 </p>
 
 ---
@@ -65,7 +65,7 @@ Inspired by life calendar visualizations and the philosophy that awareness of ti
 ## 📥 Installation
 
 ### Option 1: Download APK (Recommended)
-1. Go to [Releases](https://github.com/yourusername/year-dots/releases)
+1. Go to [Releases](https://github.com/ikrishanaa/Year-Dots/releases)
 2. Download the latest `YearDots-v*.apk`
 3. Install on your Android device (you may need to enable "Install from Unknown Sources")
 
@@ -74,7 +74,7 @@ Year Dots will be available on F-Droid repository soon.
 
 ### Option 3: Build from Source
 ```bash
-git clone https://github.com/yourusername/year-dots.git
+git clone https://github.com/ikrishanaa/Year-Dots.git
 cd year-dots
 ./gradlew assembleDebug
 # APK will be in app/build/outputs/apk/debug/
@@ -179,8 +179,8 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for de
 
 ## 🐛 Found a Bug?
 
-Please check [existing issues](https://github.com/yourusername/year-dots/issues) first. If your bug hasn't been reported:
-1. Open a [new issue](https://github.com/yourusername/year-dots/issues/new/choose)
+Please check [existing issues](https://github.com/ikrishanaa/Year-Dots/issues) first. If your bug hasn't been reported:
+1. Open a [new issue](https://github.com/ikrishanaa/Year-Dots/issues/new/choose)
 2. Use the bug report template
 3. Include your Android version and device model
 4. Attach screenshots if possible
@@ -200,7 +200,7 @@ Please check [existing issues](https://github.com/yourusername/year-dots/issues)
 - [ ] Weekly/monthly view modes
 - [ ] Tile/pattern backgrounds
 
-See [open issues](https://github.com/yourusername/year-dots/issues) for feature discussions.
+See [open issues](https://github.com/ikrishanaa/Year-Dots/issues) for feature discussions.
 
 ---
 
@@ -232,18 +232,19 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 **Krishana**  
 *Year Dots v1.0 - January 2026*
 
-- 🐛 Report bugs: [GitHub Issues](https://github.com/yourusername/year-dots/issues)
-- 💡 Suggest features: [Feature Requests](https://github.com/yourusername/year-dots/issues/new/choose)
-- 📧 Contact: [Your Email or GitHub Profile]
+- 🐛 Report bugs: [GitHub Issues](https://github.com/ikrishanaa/Year-Dots/issues)
+- 💡 Suggest features: [Feature Requests](https://github.com/ikrishanaa/Year-Dots/issues/new/choose)
+- 📧 Email: krishanaindia773@gmail.com
+- 💬 Telegram: [t.me/yeardots](https://t.me/yeardots)
 
 ---
 
 ## 📊 Stats
 
 <p align="center">
-  <img src="https://img.shields.io/github/stars/yourusername/year-dots?style=social" alt="Stars">
-  <img src="https://img.shields.io/github/forks/yourusername/year-dots?style=social" alt="Forks">
-  <img src="https://img.shields.io/github/watchers/yourusername/year-dots?style=social" alt="Watchers">
+  <img src="https://img.shields.io/github/stars/ikrishanaa/Year-Dots?style=social" alt="Stars">
+  <img src="https://img.shields.io/github/forks/ikrishanaa/Year-Dots?style=social" alt="Forks">
+  <img src="https://img.shields.io/github/watchers/ikrishanaa/Year-Dots?style=social" alt="Watchers">
 </p>
 
 ---

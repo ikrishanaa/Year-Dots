@@ -96,7 +96,7 @@ fun AboutDialog(onDismiss: () -> Unit) {
                     subtitle = "Check the GitHub repository and the README",
                     onClick = {
                         try {
-                            uriHandler.openUri("https://github.com/ikrishnaa/YearDots")
+                            uriHandler.openUri("https://github.com/ikrishanaa/Year-Dots")
                         } catch (e: Exception) {
                             Toast.makeText(context, "No browser found", Toast.LENGTH_SHORT).show()
                         }
@@ -110,7 +110,7 @@ fun AboutDialog(onDismiss: () -> Unit) {
                     subtitle = "Look for changelogs and new versions",
                     onClick = {
                         try {
-                            uriHandler.openUri("https://github.com/ikrishnaa/YearDots/releases")
+                            uriHandler.openUri("https://github.com/ikrishanaa/Year-Dots/releases")
                         } catch (e: Exception) {
                             Toast.makeText(context, "No browser found", Toast.LENGTH_SHORT).show()
                         }
@@ -124,44 +124,38 @@ fun AboutDialog(onDismiss: () -> Unit) {
                     subtitle = "Submit an issue for bug report or feature request",
                     onClick = {
                         try {
-                            uriHandler.openUri("https://github.com/ikrishnaa/YearDots/issues")
+                            uriHandler.openUri("https://github.com/ikrishanaa/Year-Dots/issues")
                         } catch (e: Exception) {
                             Toast.makeText(context, "No browser found", Toast.LENGTH_SHORT).show()
                         }
                     }
                 )
                 
-                // Sponsor (placeholder - update with your sponsor link)
+                // Telegram channel
+                AboutMenuItem(
+                    icon = Icons.Default.Send,
+                    title = "Telegram Channel",
+                    subtitle = "https://t.me/yeardots",
+                    onClick = {
+                        try {
+                            uriHandler.openUri("https://t.me/yeardots")
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "No browser found", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                )
+                
+                // Sponsor
                 AboutMenuItem(
                     icon = Icons.Default.Favorite,
                     title = "Sponsor",
                     subtitle = "Support this app by sponsoring on GitHub",
                     onClick = {
                         try {
-                            uriHandler.openUri("https://github.com/sponsors/ikrishnaa")
+                            uriHandler.openUri("https://github.com/sponsors/ikrishanaa")
                         } catch (e: Exception) {
                             Toast.makeText(context, "Not configured yet", Toast.LENGTH_SHORT).show()
                         }
-                    }
-                )
-                
-                // Telegram channel (placeholder - update with your link)
-                AboutMenuItem(
-                    icon = Icons.Default.Send,
-                    title = "Telegram channel",
-                    subtitle = "https://t.me/your_channel",
-                    onClick = {
-                        Toast.makeText(context, "Update your Telegram link", Toast.LENGTH_SHORT).show()
-                    }
-                )
-                
-                // Matrix space (placeholder - update with your link)
-                AboutMenuItem(
-                    icon = Icons.Default.Email,
-                    title = "Matrix space",
-                    subtitle = "https://matrix.to/#/#your-space.matrix.org",
-                    onClick = {
-                        Toast.makeText(context, "Update your Matrix link", Toast.LENGTH_SHORT).show()
                     }
                 )
                 
