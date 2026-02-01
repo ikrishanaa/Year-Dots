@@ -234,7 +234,8 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 - 🐛 Report bugs: [GitHub Issues](https://github.com/ikrishanaa/Year-Dots/issues)
 - 💡 Suggest features: [Feature Requests](https://github.com/ikrishanaa/Year-Dots/issues/new/choose)
-- 📧 Contact: [GitHub Profile](https://github.com/ikrishanaa)
+- 📧 Email: krishanaindia773@gmail.com
+- 💬 Telegram: [t.me/yeardots](https://t.me/yeardots)
 
 ---
 

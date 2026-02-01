@@ -73,8 +73,9 @@ Any changes to this privacy policy will be posted to this file in the repository
 ## Contact
 
 If you have questions about this privacy policy:
+- Email: krishanaindia773@gmail.com
 - Open an issue on GitHub: https://github.com/ikrishanaa/Year-Dots/issues
-- GitHub: https://github.com/ikrishanaa
+- Telegram: https://t.me/yeardots
 
 ## Your Rights
 

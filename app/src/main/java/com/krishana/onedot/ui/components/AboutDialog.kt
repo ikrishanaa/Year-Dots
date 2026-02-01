@@ -131,7 +131,21 @@ fun AboutDialog(onDismiss: () -> Unit) {
                     }
                 )
                 
-                // Sponsor (placeholder - update with your sponsor link)
+                // Telegram channel
+                AboutMenuItem(
+                    icon = Icons.Default.Send,
+                    title = "Telegram Channel",
+                    subtitle = "https://t.me/yeardots",
+                    onClick = {
+                        try {
+                            uriHandler.openUri("https://t.me/yeardots")
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "No browser found", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                )
+                
+                // Sponsor
                 AboutMenuItem(
                     icon = Icons.Default.Favorite,
                     title = "Sponsor",
