@@ -49,16 +49,16 @@ Inspired by life calendar visualizations and the philosophy that awareness of ti
 ## 📱 Screenshots
 
 <p align="center">
-  <i>Screenshots coming soon...</i>
+  <img src="screenshots/Screenshot_01.jpg" width="30%" />
+  <img src="screenshots/Screenshot_02.jpg" width="30%" />
+  <img src="screenshots/Screenshot_03.jpg" width="30%" />
+  <img src="screenshots/Screenshot_04.jpg" width="30%" />
+  <img src="screenshots/Screenshot_05.jpg" width="30%" />
+  <img src="screenshots/Screenshot_06.jpg" width="30%" />
+  <img src="screenshots/Screenshot_07.jpg" width="30%" />
+  <img src="screenshots/Screenshot_08.jpg" width="30%" />
+  <img src="screenshots/Screenshot_09.jpg" width="30%" />
 </p>
-
-<!-- TODO: Add screenshots here
-<p align="center">
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="200">
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="200">
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="200">
-</p>
--->
 
 ---
 
@@ -77,7 +77,7 @@ Year Dots will be available on F-Droid repository soon. See our [Publishing Guid
 git clone https://github.com/ikrishanaa/Year-Dots.git
 cd year-dots
 ./gradlew assembleDebug
-# APK will be in app/build/outputs/apk/debug/
+
 ```
 
 ---
