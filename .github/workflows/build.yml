@@ -30,8 +30,8 @@ jobs:
     # Run unit tests - 5 tests expected to fail due to test environment limitations
     # See walkthrough.md for details on expected failures
     - name: Run unit tests
-      run: ./gradlew test --stacktrace || echo "Tests completed with some expected failures"
-      continue-on-error: false
+      run: ./gradlew test --stacktrace
+      continue-on-error: true
       
     - name: Upload debug APK
       uses: actions/upload-artifact@v4
