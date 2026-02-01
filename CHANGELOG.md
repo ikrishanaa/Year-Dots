@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiple calendar systems (lunar, ISO week-based)
 - Milestone markers for important dates
 
+## [1.30.1] - 2026-02-01
+
+### Added
+- Multiple APK support (arm64, v7a, x86, universal) for optimized downloads.
+
 ## [1.0.0] - 2026-02-01
 
 ### Added
