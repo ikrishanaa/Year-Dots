@@ -70,7 +70,7 @@ Inspired by life calendar visualizations and the philosophy that awareness of ti
 3. Install on your Android device (you may need to enable "Install from Unknown Sources")
 
 ### Option 2: F-Droid (Coming Soon)
-Year Dots will be available on F-Droid repository soon.
+Year Dots will be available on F-Droid repository soon. See our [Publishing Guide](PUBLISHING.md) for details on F-Droid submission.
 
 ### Option 3: Build from Source
 ```bash

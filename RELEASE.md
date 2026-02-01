@@ -176,4 +176,11 @@ zipalign -v 4 app/build/outputs/apk/release/app-release-unsigned.apk \
 
 ---
 
+## See Also
+
+- **[PUBLISHING.md](PUBLISHING.md)** - Guide for publishing to F-Droid and other platforms
+- **[CHANGELOG.md](CHANGELOG.md)** - Detailed version history
+
+---
+
 **Questions?** Open an issue or contact maintainers.

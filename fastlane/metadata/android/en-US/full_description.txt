@@ -1,0 +1,19 @@
+Year Dots transforms your phone's wallpaper into a daily reminder of time's passage. Each day of the year is represented by a single dot in a 365-dot grid that updates automatically at midnight.
+
+Features:
+• 365-dot calendar grid - Visual representation of the entire year
+• Automatic daily updates - Wallpaper refreshes at midnight
+• Fully customizable colors - Choose colors for past, present, future, and background
+• Four dot shapes - Circle, Rounded Square, Square, and Pill
+• Four size options - Tiny, Small, Medium, and Large dot densities
+• Live preview - See changes in real-time before applying
+
+Privacy & Performance:
+• 100% Offline - No internet permission, no tracking
+• Battery Efficient - Optimized background tasks
+• AMOLED-Friendly - Dark backgrounds save battery
+• No Data Collection - Your privacy is guaranteed
+
+Inspired by life calendar visualizations and the philosophy that awareness of time's finite nature helps us live more intentionally.
+
+Open source under MIT License.
