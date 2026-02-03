@@ -36,7 +36,7 @@ git add .
 git commit -m "Initial commit: Year Dots v1.0.0"
 
 # Create repository on GitHub, then:
-git remote add origin https://github.com/ikrishanaa/Year-Dots.git
+git remote add origin https://github.com/ikrishanaa/Yeardots.git
 git branch -M main
 git push -u origin main
 ```
@@ -264,8 +264,8 @@ Categories:
   - System
 License: MIT
 AuthorName: Krishana
-SourceCode: https://github.com/ikrishanaa/Year-Dots
-IssueTracker: https://github.com/ikrishanaa/Year-Dots/issues
+SourceCode: https://github.com/ikrishanaa/Yeardots
+IssueTracker: https://github.com/ikrishanaa/Yeardots/issues
 
 AutoName: Year Dots
 Summary: Daily wallpaper showing year progress with 365 dots
@@ -281,7 +281,7 @@ Description: |-
     * 100% offline, no tracking
 
 RepoType: git
-Repo: https://github.com/ikrishanaa/Year-Dots.git
+Repo: https://github.com/ikrishanaa/Yeardots.git
 
 Builds:
   - versionName: '1.0.0'

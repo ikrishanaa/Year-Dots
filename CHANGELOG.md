@@ -69,5 +69,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/ikrishanaa/Year-Dots/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/ikrishanaa/Year-Dots/releases/tag/v1.0.0
+[Unreleased]: https://github.com/ikrishanaa/Yeardots/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/ikrishanaa/Yeardots/releases/tag/v1.0.0
