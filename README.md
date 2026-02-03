@@ -18,13 +18,13 @@
 
 ---
 
-## 📖 About
+## 📖 About Yeardots
 
-**Year Dots** transforms your phone's wallpaper into a daily reminder of time's passage. Each day of the year is represented by a single dot in a 365-dot grid that updates automatically at midnight.
+**Yeardots** is a minimalist **life calendar** and **productivity wallpaper** for Android that visualizes your year as a 365-dot grid. It transforms your home screen into a daily reminder of time's passage (Memento Mori), helping you beat procrastination and live more intentionally.
 
-> *"Time is passing. Make it count."* ⏳
+> *"We have two lives, and the second begins when we realize we only have one."* — Confucius
 
-Inspired by life calendar visualizations and the philosophy that awareness of time's finite nature helps us live more intentionally.
+Designed for fans of **Stoicism**, **digital minimalism**, and quantifiable self-improvement, Yeardots offers a quiet, offline, and battery-friendly way to stay visualized on your long-term goals. Every midnight, one more dot fills in—nudging you to make today count.
 
 ---
 
